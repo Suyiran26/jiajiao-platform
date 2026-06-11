@@ -5,10 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="家教信息平台 - 免费发布家教求职与招聘信息，发现好老师，找到好学生">
 <meta name="theme-color" content="#534AB7">
-<meta property="og:title" content="家教信息平台">
-<meta property="og:description" content="免费发布家教求职与招聘信息">
+<meta property="og:title" content="肃宁县家教平台">
+<meta property="og:description" content="肃宁县家教信息发布平台，免费发布家教求职与招聘信息">
 <meta property="og:type" content="website">
-<title>家教信息平台 - 发现好老师，找到好学生</title>
+<title>肃宁县家教平台 - 发现好老师，找到好学生</title>
 <style>
   /* ============ CSS CUSTOM PROPERTIES ============ */
   :root {
@@ -137,6 +137,34 @@
   .stat-item { text-align: center; }
   .stat-num { font-size: clamp(20px, 3vw, 26px); font-weight: 700; color: var(--color-primary); line-height: 1.2; }
   .stat-label { font-size: 12px; color: var(--color-text-muted); }
+
+  /* ============ HOW IT WORKS ============ */
+  .how-it-works {
+    padding: 32px max(16px, 3vw);
+    background: var(--color-surface);
+    border-bottom: 1px solid var(--color-border);
+  }
+  .steps {
+    max-width: 800px; margin: 0 auto;
+    display: flex; align-items: flex-start; justify-content: center;
+    gap: 0;
+  }
+  .step {
+    flex: 1; text-align: center;
+    padding: 0 12px;
+  }
+  .step-icon {
+    width: 48px; height: 48px; border-radius: 50%;
+    background: var(--color-primary-light);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; margin: 0 auto 10px;
+  }
+  .step-title { font-size: 14px; font-weight: 600; color: var(--color-text); margin-bottom: 4px; }
+  .step-desc { font-size: 12px; color: var(--color-text-muted); line-height: 1.5; }
+  .step-arrow {
+    font-size: 20px; color: #ccc;
+    padding-top: 12px; flex-shrink: 0;
+  }
 
   /* ============ MAIN LAYOUT ============ */
   .container { max-width: 1140px; margin: 0 auto; padding: 20px max(16px, 3vw); }
@@ -487,6 +515,11 @@
     .header-actions { gap: 4px; }
     .card { padding: 14px; }
   }
+
+  @media (max-width: 600px) {
+    .steps { flex-direction: column; align-items: center; gap: 16px; }
+    .step-arrow { transform: rotate(90deg); padding-top: 0; }
+  }
 </style>
 </head>
 <body aria-label="家教信息平台">
@@ -497,8 +530,8 @@
     <button class="hamburger" id="hamburger" aria-label="打开菜单" aria-expanded="false">
       <span></span><span></span><span></span>
     </button>
-    <a class="logo" href="/" aria-label="家教信息平台首页">
-      <span class="icon">&#127891;</span> 家教平台
+    <a class="logo" href="/" aria-label="肃宁县家教平台首页">
+      <span class="icon">&#127891;</span> 肃宁县家教平台
     </a>
   </div>
   <div class="header-actions">
@@ -509,8 +542,8 @@
 
 <!-- ============ HERO ============ -->
 <section class="hero" role="region" aria-label="欢迎横幅">
-  <h1>发现好老师，找到好学生</h1>
-  <p>免费发布家教求职与招聘信息，高效连接师生双方</p>
+  <h1>肃宁县家教平台</h1>
+  <p>发现好老师，找到好学生 — 肃宁本地免费家教信息发布平台</p>
   <button class="btn-hero post-btn-hero" aria-label="立即发布信息">&#9997; 立即发布信息</button>
 </section>
 
@@ -519,6 +552,29 @@
   <div class="stat-item"><div class="stat-num" id="statTotal">--</div><div class="stat-label">信息总数</div></div>
   <div class="stat-item"><div class="stat-num" id="statTeacher">--</div><div class="stat-label">老师求职</div></div>
   <div class="stat-item"><div class="stat-num" id="statStudent">--</div><div class="stat-label">学生招聘</div></div>
+</div>
+
+<!-- ============ HOW IT WORKS ============ -->
+<div class="how-it-works" role="region" aria-label="使用指引">
+  <div class="steps">
+    <div class="step">
+      <div class="step-icon">&#9997;</div>
+      <div class="step-title">发布信息</div>
+      <div class="step-desc">老师发布求职，家长发布招聘，填写科目和联系方式</div>
+    </div>
+    <div class="step-arrow">&#10132;</div>
+    <div class="step">
+      <div class="step-icon">&#128269;</div>
+      <div class="step-title">筛选匹配</div>
+      <div class="step-desc">按科目、年级、地区筛选，找到最适合的对方</div>
+    </div>
+    <div class="step-arrow">&#10132;</div>
+    <div class="step">
+      <div class="step-icon">&#128172;</div>
+      <div class="step-title">直接联系</div>
+      <div class="step-desc">点击查看联系方式，双方直接沟通，无中介费</div>
+    </div>
+  </div>
 </div>
 
 <!-- ============ SIDEBAR OVERLAY (mobile) ============ -->
@@ -740,8 +796,35 @@
 <!-- ============ TOAST ============ -->
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
+<!-- ============ WELCOME MODAL (first visit only) ============ -->
+<div class="overlay show" id="welcomeOverlay" role="dialog" aria-modal="true" aria-label="欢迎访问肃宁县家教平台">
+  <div class="modal" style="max-width:440px;text-align:center">
+    <div style="font-size:48px;margin-bottom:12px">&#127891;</div>
+    <h2 style="font-size:20px;font-weight:600;margin-bottom:8px">欢迎来到肃宁县家教平台</h2>
+    <p style="font-size:14px;color:var(--color-text-secondary);line-height:1.7;margin-bottom:20px">
+      本平台供<strong>家教老师发布求职</strong>信息，以及<strong>学生和家长发布招聘</strong>需求。
+      <br>完全免费，双方直接联系，无任何中介费用。
+    </p>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:20px">
+      <span style="background:var(--color-primary-light);color:var(--color-primary);padding:4px 12px;border-radius:20px;font-size:12px;font-weight:500">&#127979; 老师求职</span>
+      <span style="background:var(--color-success-light);color:var(--color-success);padding:4px 12px;border-radius:20px;font-size:12px;font-weight:500">&#128218; 家长招聘</span>
+      <span style="background:#FFF3E0;color:#E65100;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:500">&#128161; 完全免费</span>
+    </div>
+    <div class="form-footer" style="justify-content:center">
+      <button class="btn-submit" id="welcomeClose" style="padding:10px 40px">我知道了，开始使用</button>
+    </div>
+  </div>
+</div>
+
 <!-- ============ SCRIPTS ============ -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js" defer></script>
+
+<!-- ============ FOOTER ============ -->
+<footer role="contentinfo" style="background:var(--color-surface);border-top:1px solid var(--color-border);padding:24px max(16px,3vw);text-align:center;font-size:12px;color:var(--color-text-muted);line-height:1.8">
+  <div style="margin-bottom:8px;font-size:14px;font-weight:600;color:var(--color-text)">肃宁县家教平台</div>
+  <div>自由发布 &middot; 直接联系 &middot; 完全免费 &middot; 无中介</div>
+  <div style="margin-top:8px">数据存储于 Supabase &middot; 托管于 GitHub Pages</div>
+</footer>
 <script>
 (function() {
 'use strict';
@@ -1436,6 +1519,21 @@ function bindAll() {
     });
   });
 
+  // === WELCOME MODAL (first visit) ===
+  var welcomeClose = document.getElementById('welcomeClose');
+  var welcomeOverlay = document.getElementById('welcomeOverlay');
+  if (welcomeClose) welcomeClose.addEventListener('click', function() {
+    welcomeOverlay.classList.remove('show');
+    localStorage.setItem('tutor_welcome_seen', '1');
+  });
+  // Auto-close on overlay click
+  if (welcomeOverlay) welcomeOverlay.addEventListener('click', function(e) {
+    if (e.target === welcomeOverlay) {
+      welcomeOverlay.classList.remove('show');
+      localStorage.setItem('tutor_welcome_seen', '1');
+    }
+  });
+
   // === HAMBURGER ===
   var hamburger = document.getElementById('hamburger');
   if (hamburger) hamburger.addEventListener('click', toggleSidebar);
@@ -1545,6 +1643,12 @@ function init() {
   // Initialize area dropdowns (publish + edit forms)
   initAreaSelects('f_province', 'f_city', 'f_district', DEFAULT_AREA.province, DEFAULT_AREA.city, DEFAULT_AREA.district);
   initAreaSelects('edit_province', 'edit_city', 'edit_district', DEFAULT_AREA.province, DEFAULT_AREA.city, DEFAULT_AREA.district);
+
+  // Hide welcome modal if already seen
+  if (localStorage.getItem('tutor_welcome_seen') === '1') {
+    var wo = document.getElementById('welcomeOverlay');
+    if (wo) wo.classList.remove('show');
+  }
 
   bindAll();
   renderCards();
