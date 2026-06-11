@@ -1,0 +1,1174 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>家教信息平台</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: system-ui, -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: #f7f6f3;
+    color: #2c2c2a;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  /* ===== HEADER ===== */
+  header {
+    background: #fff;
+    border-bottom: 1px solid #e8e7e0;
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 60px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  header .logo {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 18px; font-weight: 500; color: #3C3489;
+  }
+  header .logo .icon { font-size: 22px; }
+  header .post-btn {
+    background: #534AB7;
+    color: #fff;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background 0.15s;
+  }
+  header .post-btn:hover { background: #3C3489; }
+  header .admin-btn {
+    background: transparent;
+    color: #888;
+    border: 1px solid #ddd;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  header .admin-btn:hover { border-color: #534AB7; color: #534AB7; }
+  header .admin-btn.active { background: #534AB7; color: #fff; border-color: #534AB7; }
+
+  /* ===== MAIN LAYOUT ===== */
+  .container { max-width: 1100px; margin: 0 auto; padding: 24px 20px; }
+
+  .layout { display: flex; gap: 24px; }
+
+  /* ===== SIDEBAR ===== */
+  .sidebar { width: 240px; flex-shrink: 0; }
+
+  .filter-card {
+    background: #fff;
+    border-radius: 12px;
+    border: 1px solid #e8e7e0;
+    padding: 18px;
+    margin-bottom: 16px;
+  }
+  .filter-card h3 {
+    font-size: 13px;
+    font-weight: 500;
+    color: #888780;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .filter-group { margin-bottom: 10px; }
+  .filter-group label {
+    display: flex; align-items: center; gap: 8px;
+    cursor: pointer; font-size: 13px; color: #444;
+    padding: 4px 0;
+  }
+  .filter-group label input[type="checkbox"] { accent-color: #534AB7; width: 15px; height: 15px; }
+  .filter-group label:hover { color: #534AB7; }
+
+  .filter-card select {
+    width: 100%; padding: 7px 10px;
+    border: 1px solid #ddd; border-radius: 8px;
+    font-size: 13px; color: #333;
+    background: #fff; cursor: pointer;
+    outline: none;
+  }
+  .filter-card select:focus { border-color: #534AB7; }
+
+  /* ===== MAIN CONTENT ===== */
+  .main-content { flex: 1; min-width: 0; }
+
+  .search-bar {
+    display: flex; gap: 10px; margin-bottom: 20px;
+  }
+  .search-bar input {
+    flex: 1; padding: 10px 16px;
+    border: 1px solid #ddd; border-radius: 8px;
+    font-size: 14px; outline: none;
+    transition: border-color 0.15s;
+  }
+  .search-bar input:focus { border-color: #534AB7; }
+  .search-bar button {
+    padding: 10px 20px;
+    background: #534AB7; color: #fff;
+    border: none; border-radius: 8px;
+    font-size: 14px; cursor: pointer; font-weight: 500;
+    transition: background 0.15s;
+  }
+  .search-bar button:hover { background: #3C3489; }
+
+  .tabs {
+    display: flex; gap: 4px; margin-bottom: 16px;
+    background: #fff; padding: 5px;
+    border-radius: 10px; border: 1px solid #e8e7e0;
+    width: fit-content;
+  }
+  .tab-btn {
+    padding: 7px 20px; border: none;
+    border-radius: 7px; cursor: pointer;
+    font-size: 13px; font-weight: 500;
+    background: transparent; color: #888;
+    transition: all 0.15s;
+  }
+  .tab-btn.active { background: #EEEDFE; color: #534AB7; }
+  .tab-btn:hover:not(.active) { background: #f5f5f0; }
+
+  .sort-row {
+    display: flex; align-items: center;
+    gap: 8px; margin-bottom: 14px;
+    font-size: 13px; color: #888;
+  }
+  .sort-row select {
+    border: 1px solid #ddd; border-radius: 6px;
+    padding: 4px 8px; font-size: 13px;
+    background: #fff; cursor: pointer; outline: none;
+  }
+
+  /* ===== CARD ===== */
+  .card-list { display: flex; flex-direction: column; gap: 12px; }
+
+  .card {
+    background: #fff;
+    border-radius: 12px;
+    border: 1px solid #e8e7e0;
+    padding: 20px;
+    transition: box-shadow 0.15s, border-color 0.15s;
+    cursor: pointer;
+  }
+  .card:hover {
+    box-shadow: 0 4px 16px rgba(0,0,0,0.07);
+    border-color: #c5c3e8;
+  }
+  .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+  .card-title {
+    font-size: 15px; font-weight: 500; color: #2c2c2a;
+    margin-right: 12px;
+  }
+  .tag {
+    display: inline-block;
+    padding: 2px 10px; border-radius: 20px;
+    font-size: 12px; font-weight: 500;
+    white-space: nowrap;
+  }
+  .tag-teacher { background: #EEEDFE; color: #534AB7; }
+  .tag-student { background: #E1F5EE; color: #0F6E56; }
+  .tag-urgent { background: #FAECE7; color: #993C1D; }
+
+  .card-meta {
+    display: flex; flex-wrap: wrap; gap: 14px;
+    font-size: 13px; color: #666;
+    margin-bottom: 10px;
+  }
+  .card-meta span { display: flex; align-items: center; gap: 4px; }
+  .card-meta .ico { font-size: 14px; }
+
+  .card-desc {
+    font-size: 13px; color: #888;
+    display: -webkit-box; -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical; overflow: hidden;
+  }
+  .card-footer {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-top: 14px; padding-top: 12px;
+    border-top: 1px solid #f0efe8;
+  }
+  .card-time { font-size: 12px; color: #aaa; }
+  .contact-btn {
+    padding: 6px 16px;
+    background: #534AB7; color: #fff;
+    border: none; border-radius: 6px;
+    font-size: 13px; cursor: pointer;
+    transition: background 0.15s;
+  }
+  .contact-btn:hover { background: #3C3489; }
+  .admin-action-btn {
+    padding: 6px 12px;
+    border: none; border-radius: 6px;
+    font-size: 12px; cursor: pointer;
+    transition: background 0.15s;
+  }
+  .edit-btn {
+    background: #E8F0FE; color: #1a73e8;
+  }
+  .edit-btn:hover { background: #D2E3FC; }
+  .delete-btn {
+    background: #FCE8E6; color: #d93025;
+  }
+  .delete-btn:hover { background: #F8D7DA; }
+
+  /* ===== EMPTY STATE ===== */
+  .empty {
+    text-align: center; padding: 60px 20px;
+    color: #aaa; font-size: 14px;
+  }
+  .empty .empty-icon { font-size: 48px; margin-bottom: 16px; }
+
+  /* ===== MODAL OVERLAY ===== */
+  .overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.25);
+    z-index: 200;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+  }
+  .overlay.show { display: flex; }
+
+  /* ===== MODAL ===== */
+  .modal {
+    background: #fff; border-radius: 16px;
+    width: 100%; max-width: 560px;
+    max-height: 90vh; overflow-y: auto;
+    padding: 28px;
+    position: relative;
+  }
+  .modal-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 24px;
+  }
+  .modal-header h2 { font-size: 17px; font-weight: 500; }
+  .modal-close {
+    width: 32px; height: 32px; border-radius: 8px;
+    border: 1px solid #e0e0e0; background: #fff;
+    cursor: pointer; font-size: 16px;
+    display: flex; align-items: center; justify-content: center;
+    color: #666; transition: all 0.15s;
+  }
+  .modal-close:hover { background: #f5f5f0; border-color: #ccc; }
+
+  .form-group { margin-bottom: 18px; }
+  .form-group label {
+    display: block; font-size: 13px;
+    font-weight: 500; color: #555;
+    margin-bottom: 6px;
+  }
+  .form-group label .req { color: #E24B4A; margin-left: 2px; }
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    width: 100%; padding: 9px 12px;
+    border: 1px solid #ddd; border-radius: 8px;
+    font-size: 14px; outline: none;
+    transition: border-color 0.15s;
+    font-family: inherit;
+  }
+  .form-group input:focus,
+  .form-group select:focus,
+  .form-group textarea:focus { border-color: #534AB7; }
+  .form-group textarea { min-height: 80px; resize: vertical; }
+
+  .form-row { display: flex; gap: 14px; }
+  .form-row .form-group { flex: 1; }
+
+  .role-toggle {
+    display: flex; gap: 8px;
+  }
+  .role-btn {
+    flex: 1; padding: 9px;
+    border: 1.5px solid #ddd; border-radius: 8px;
+    background: #fff; cursor: pointer;
+    font-size: 13px; font-weight: 500; color: #666;
+    transition: all 0.15s; text-align: center;
+  }
+  .role-btn.active-teacher { border-color: #534AB7; background: #EEEDFE; color: #534AB7; }
+  .role-btn.active-student { border-color: #0F6E56; background: #E1F5EE; color: #0F6E56; }
+  .role-btn:hover:not(.active-teacher):not(.active-student) { border-color: #999; }
+
+  .subjects-grid {
+    display: flex; flex-wrap: wrap; gap: 8px;
+  }
+  .subject-chip {
+    padding: 5px 12px; border: 1.5px solid #ddd;
+    border-radius: 20px; cursor: pointer;
+    font-size: 13px; color: #555;
+    background: #fff; transition: all 0.15s;
+    user-select: none;
+  }
+  .subject-chip.selected { border-color: #534AB7; background: #EEEDFE; color: #534AB7; }
+
+  .form-footer {
+    display: flex; justify-content: flex-end; gap: 10px;
+    margin-top: 24px; padding-top: 18px;
+    border-top: 1px solid #f0efe8;
+  }
+  .btn-cancel {
+    padding: 9px 22px; border: 1px solid #ddd;
+    border-radius: 8px; background: #fff;
+    font-size: 14px; cursor: pointer; color: #666;
+  }
+  .btn-cancel:hover { background: #f5f5f0; }
+  .btn-submit {
+    padding: 9px 26px; background: #534AB7;
+    color: #fff; border: none; border-radius: 8px;
+    font-size: 14px; font-weight: 500; cursor: pointer;
+    transition: background 0.15s;
+  }
+  .btn-submit:hover { background: #3C3489; }
+
+  /* ===== TOAST ===== */
+  .toast {
+    position: fixed; bottom: 30px; left: 50%;
+    transform: translateX(-50%);
+    background: #2c2c2a; color: #fff;
+    padding: 10px 22px; border-radius: 10px;
+    font-size: 14px; z-index: 500;
+    opacity: 0; transition: opacity 0.2s;
+    pointer-events: none;
+  }
+  .toast.show { opacity: 1; }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 700px) {
+    .layout { flex-direction: column; }
+    .sidebar { width: 100%; }
+    .form-row { flex-direction: column; gap: 0; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <span class="icon">&#127891;</span>
+    家教信息平台
+  </div>
+  <button class="post-btn">+ 发布信息</button>
+  <button class="admin-btn" id="adminToggle">&#9881; 管理</button>
+</header>
+
+<div class="container">
+  <div class="layout">
+
+    <!-- ===== SIDEBAR ===== -->
+    <aside class="sidebar">
+      <div class="filter-card">
+        <h3>类型</h3>
+        <div class="filter-group">
+          <label><input type="checkbox" class="filter-type" value="teacher" checked> 家教老师 (求职)</label>
+          <label><input type="checkbox" class="filter-type" value="student" checked> 学生/家长 (招聘)</label>
+        </div>
+      </div>
+
+      <div class="filter-card">
+        <h3>科目</h3>
+        <div id="subjectFilter">
+          <div class="filter-group">
+            <label><input type="checkbox" class="filter-subject" value="语文" checked> 语文</label>
+            <label><input type="checkbox" class="filter-subject" value="数学" checked> 数学</label>
+            <label><input type="checkbox" class="filter-subject" value="英语" checked> 英语</label>
+            <label><input type="checkbox" class="filter-subject" value="物理" checked> 物理</label>
+            <label><input type="checkbox" class="filter-subject" value="化学" checked> 化学</label>
+            <label><input type="checkbox" class="filter-subject" value="生物" checked> 生物</label>
+            <label><input type="checkbox" class="filter-subject" value="历史" checked> 历史</label>
+            <label><input type="checkbox" class="filter-subject" value="地理" checked> 地理</label>
+            <label><input type="checkbox" class="filter-subject" value="政治" checked> 政治</label>
+            <label><input type="checkbox" class="filter-subject" value="编程" checked> 编程</label>
+            <label><input type="checkbox" class="filter-subject" value="音乐" checked> 音乐</label>
+            <label><input type="checkbox" class="filter-subject" value="美术" checked> 美术</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="filter-card">
+        <h3>年级</h3>
+        <select id="gradeFilter">
+          <option value="">全部年级</option>
+          <option>小学</option>
+          <option>初中</option>
+          <option>高中</option>
+          <option>大学</option>
+          <option>成人</option>
+        </select>
+      </div>
+
+      <div class="filter-card">
+        <h3>授课方式</h3>
+        <div class="filter-group">
+          <label><input type="checkbox" class="filter-mode" value="上门" checked> 上门授课</label>
+          <label><input type="checkbox" class="filter-mode" value="线上" checked> 线上授课</label>
+          <label><input type="checkbox" class="filter-mode" value="线下" checked> 线下机构</label>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <main class="main-content">
+      <div class="search-bar">
+        <input type="text" id="searchInput" placeholder="搜索科目、地区、姓名...">
+        <button id="searchBtn">搜索</button>
+      </div>
+
+      <div class="tabs">
+        <button class="tab-btn active" data-tab="all">全部</button>
+        <button class="tab-btn" data-tab="teacher">家教老师</button>
+        <button class="tab-btn" data-tab="student">学生/家长</button>
+      </div>
+
+      <div class="sort-row">
+        <span>排序：</span>
+        <select id="sortSelect">
+          <option value="time">最新发布</option>
+          <option value="price_asc">价格从低到高</option>
+          <option value="price_desc">价格从高到低</option>
+        </select>
+        <span style="margin-left: auto;" id="countLabel"></span>
+      </div>
+
+      <div class="card-list" id="cardList"></div>
+    </main>
+
+  </div>
+</div>
+
+<!-- ===== MODAL ===== -->
+<div class="overlay" id="overlay">
+  <div class="modal" id="modal">
+    <div class="modal-header">
+      <h2>发布家教信息</h2>
+      <button class="modal-close">&#10005;</button>
+    </div>
+
+    <form id="postForm">
+
+      <div class="form-group">
+        <label>我是<span class="req">*</span></label>
+        <div class="role-toggle">
+          <button type="button" class="role-btn active-teacher" id="roleTeacher">&#127979; 家教老师 (求职)</button>
+          <button type="button" class="role-btn" id="roleStudent">&#128218; 学生/家长 (招聘)</button>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>姓名<span class="req">*</span></label>
+          <input type="text" id="f_name" placeholder="请输入姓名" required>
+        </div>
+        <div class="form-group" id="grp_gender">
+          <label>性别</label>
+          <select id="f_gender">
+            <option value="">不透露</option>
+            <option>男</option>
+            <option>女</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>授课科目<span class="req">*</span></label>
+        <div class="subjects-grid" id="subjectChips">
+          <div class="subject-chip">语文</div>
+          <div class="subject-chip">数学</div>
+          <div class="subject-chip">英语</div>
+          <div class="subject-chip">物理</div>
+          <div class="subject-chip">化学</div>
+          <div class="subject-chip">生物</div>
+          <div class="subject-chip">历史</div>
+          <div class="subject-chip">地理</div>
+          <div class="subject-chip">政治</div>
+          <div class="subject-chip">编程</div>
+          <div class="subject-chip">音乐</div>
+          <div class="subject-chip">美术</div>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label id="gradeLabel">学生年级<span class="req">*</span></label>
+          <select id="f_grade" required>
+            <option value="">请选择</option>
+            <option>小学</option>
+            <option>初中</option>
+            <option>高中</option>
+            <option>大学</option>
+            <option>成人</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>授课方式<span class="req">*</span></label>
+          <select id="f_mode" required>
+            <option value="">请选择</option>
+            <option>上门授课</option>
+            <option>线上授课</option>
+            <option>线下机构</option>
+            <option>均可</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>地区<span class="req">*</span></label>
+          <input type="text" id="f_location" placeholder="如：北京市朝阳区" required>
+        </div>
+        <div class="form-group">
+          <label id="priceLabel">期望薪资 (元/小时)<span class="req">*</span></label>
+          <input type="number" id="f_price" placeholder="如：150" min="0" required>
+        </div>
+      </div>
+
+      <div class="form-group" id="grp_edu">
+        <label>学历 / 院校</label>
+        <input type="text" id="f_edu" placeholder="如：北京大学 本科">
+      </div>
+
+      <div class="form-group">
+        <label>联系方式<span class="req">*</span></label>
+        <input type="text" id="f_contact" placeholder="手机号 / 微信号" required>
+      </div>
+
+      <div class="form-group">
+        <label>详细介绍</label>
+        <textarea id="f_desc" placeholder="请简要介绍自己的教学经历、特点，或招聘需求..."></textarea>
+      </div>
+
+      <div class="form-footer">
+        <button type="button" class="btn-cancel">取消</button>
+        <button type="submit" class="btn-submit">发布</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- ===== 管理密码弹窗 ===== -->
+<div class="overlay" id="adminOverlay">
+  <div class="modal" style="max-width:380px">
+    <div class="modal-header">
+      <h2>管理员验证</h2>
+    </div>
+    <div class="form-group">
+      <label>请输入管理密码</label>
+      <input type="password" id="adminPassword" placeholder="输入密码">
+    </div>
+    <div class="form-footer">
+      <button type="button" class="btn-cancel" id="adminCancel">取消</button>
+      <button type="button" class="btn-submit" id="adminConfirm">确认</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 编辑弹窗（复用结构）===== -->
+<div class="overlay" id="editOverlay">
+  <div class="modal" style="max-width:560px">
+    <div class="modal-header">
+      <h2 id="editTitle">编辑信息</h2>
+      <button class="modal-close" id="editCloseBtn">&#10005;</button>
+    </div>
+    <form id="editForm">
+      <div class="form-group">
+        <label>我是</label>
+        <div class="role-toggle">
+          <button type="button" class="role-btn active-teacher" id="editRoleTeacher">&#127979; 家教老师 (求职)</button>
+          <button type="button" class="role-btn" id="editRoleStudent">&#128218; 学生/家长 (招聘)</button>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>姓名<span class="req">*</span></label>
+          <input type="text" id="edit_name" required>
+        </div>
+        <div class="form-group">
+          <label>性别</label>
+          <select id="edit_gender">
+            <option value="">不透露</option>
+            <option>男</option>
+            <option>女</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>授课科目<span class="req">*</span></label>
+        <div class="subjects-grid" id="editSubjectChips">
+          <div class="subject-chip">语文</div><div class="subject-chip">数学</div>
+          <div class="subject-chip">英语</div><div class="subject-chip">物理</div>
+          <div class="subject-chip">化学</div><div class="subject-chip">生物</div>
+          <div class="subject-chip">历史</div><div class="subject-chip">地理</div>
+          <div class="subject-chip">政治</div><div class="subject-chip">编程</div>
+          <div class="subject-chip">音乐</div><div class="subject-chip">美术</div>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label id="editGradeLabel">学生年级<span class="req">*</span></label>
+          <select id="edit_grade" required>
+            <option value="">请选择</option>
+            <option>小学</option><option>初中</option><option>高中</option><option>大学</option><option>成人</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>授课方式<span class="req">*</span></label>
+          <select id="edit_mode" required>
+            <option value="">请选择</option>
+            <option>上门授课</option><option>线上授课</option><option>线下机构</option><option>均可</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>地区<span class="req">*</span></label>
+          <input type="text" id="edit_location" required>
+        </div>
+        <div class="form-group">
+          <label id="editPriceLabel">期望薪资 (元/小时)<span class="req">*</span></label>
+          <input type="number" id="edit_price" min="0" required>
+        </div>
+      </div>
+      <div class="form-group" id="edit_grp_edu">
+        <label>学历 / 院校</label>
+        <input type="text" id="edit_edu">
+      </div>
+      <div class="form-group">
+        <label>联系方式<span class="req">*</span></label>
+        <input type="text" id="edit_contact" required>
+      </div>
+      <div class="form-group">
+        <label>详细介绍</label>
+        <textarea id="edit_desc"></textarea>
+      </div>
+      <div class="form-footer">
+        <button type="button" class="btn-cancel" id="editCancel">取消</button>
+        <button type="submit" class="btn-submit">保存修改</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+(function() {
+'use strict';
+
+// ========== 内置错误显示 ==========
+function showPageError(msg) {
+  var banner = document.getElementById('pageError');
+  if (!banner) {
+    banner = document.createElement('div');
+    banner.id = 'pageError';
+    banner.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:9999;padding:14px 20px;background:#E24B4A;color:#fff;font-size:14px;text-align:center;font-weight:500;';
+    document.body.insertBefore(banner, document.body.firstChild);
+  }
+  banner.textContent = '⚠ ' + msg;
+}
+
+// ========== SUPABASE 配置 ==========
+var SUPABASE_URL = 'https://pjwnpdgoffsolauxhcju.supabase.co';
+var SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBqd25wZGdvZmZzb2xhdXhoY2p1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODExMzMyOTQsImV4cCI6MjA5NjcwOTI5NH0.HbLsVEwYZ3mmuBtj1z1o2gKxytMKfn7qJuaawZVhV2c';
+
+var supabase;
+try {
+  if (typeof window.supabase === 'undefined') {
+    showPageError('Supabase SDK 加载失败，请检查网络');
+  } else {
+    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  }
+} catch(e) {
+  showPageError('初始化失败: ' + e.message);
+}
+
+var currentRole = 'teacher';
+var currentTab = 'all';
+var cachedData = [];
+
+// ========== 数据读取 ==========
+async function fetchData() {
+  if (!supabase) return [];
+  try {
+    var result = await supabase.from('tutors').select('*').order('created_at', { ascending: false });
+    if (result.error) { console.error('读取失败:', result.error); return []; }
+    return (result.data || []).map(function(row) { return {
+      id: row.id, role: row.role, name: row.name, gender: row.gender || '',
+      subjects: row.subjects || [], grade: row.grade, mode: row.mode,
+      location: row.location, price: row.price, edu: row.edu || '',
+      contact: row.contact, desc: row.description || '',
+      time: new Date(row.created_at).getTime(), urgent: row.urgent || false
+    };});
+  } catch(e) {
+    showPageError('数据加载失败: ' + e.message);
+    return [];
+  }
+}
+
+// ========== FILTERS ==========
+function getFilters() {
+  var types = [].slice.call(document.querySelectorAll('.filter-type:checked')).map(function(el){return el.value;});
+  var subjects = [].slice.call(document.querySelectorAll('.filter-subject:checked')).map(function(el){return el.value;});
+  var modes = [].slice.call(document.querySelectorAll('.filter-mode:checked')).map(function(el){return el.value;});
+  var grade = document.getElementById('gradeFilter').value;
+  var q = document.getElementById('searchInput').value.trim().toLowerCase();
+  var sort = document.getElementById('sortSelect').value;
+  return { types: types, subjects: subjects, modes: modes, grade: grade, q: q, sort: sort };
+}
+
+function switchTab(btn) {
+  document.querySelectorAll('.tab-btn').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+  currentTab = btn.dataset.tab;
+  renderCards();
+}
+
+async function renderCards() {
+  if (!supabase) {
+    document.getElementById('cardList').innerHTML = '<div class="empty"><div class="empty-icon">&#9888;</div><p>数据库未连接，请检查网络后刷新</p></div>';
+    return;
+  }
+  cachedData = await fetchData();
+  var f = getFilters();
+  var list = cachedData.filter(function(item) {
+    if (currentTab !== 'all' && item.role !== currentTab) return false;
+    if (!f.types.includes(item.role)) return false;
+    if (f.grade && item.grade !== f.grade) return false;
+    var modeMatch = f.modes.some(function(m){ return item.mode.includes(m) || item.mode === '均可'; });
+    if (!modeMatch) return false;
+    if (f.subjects.length > 0) {
+      var subjectMatch = item.subjects.some(function(s){ return f.subjects.includes(s); });
+      if (!subjectMatch) return false;
+    }
+    if (f.q) {
+      var text = [item.name, item.subjects.join(' '), item.location, item.desc, item.edu].join(' ').toLowerCase();
+      if (!text.includes(f.q)) return false;
+    }
+    return true;
+  });
+
+  if (f.sort === 'time') list.sort(function(a,b){ return b.time - a.time; });
+  else if (f.sort === 'price_asc') list.sort(function(a,b){ return a.price - b.price; });
+  else if (f.sort === 'price_desc') list.sort(function(a,b){ return b.price - a.price; });
+
+  var container = document.getElementById('cardList');
+  document.getElementById('countLabel').textContent = '共 ' + list.length + ' 条';
+  if (list.length === 0) {
+    container.innerHTML = '<div class="empty"><div class="empty-icon">&#128269;</div><p>暂无符合条件的信息</p></div>';
+    return;
+  }
+  container.innerHTML = list.map(function(item) {
+    return '<div class="card" data-id="' + item.id + '">'
+    + '<div class="card-header">'
+    + '<span class="card-title">' + esc(item.name) + ' · ' + item.subjects.join(' / ') + '</span>'
+    + '<div style="display:flex;gap:6px;flex-shrink:0">'
+    + (item.urgent ? '<span class="tag tag-urgent">急招</span>' : '')
+    + '<span class="tag ' + (item.role === 'teacher' ? 'tag-teacher' : 'tag-student') + '">' + (item.role === 'teacher' ? '老师求职' : '家长招聘') + '</span>'
+    + '</div></div>'
+    + '<div class="card-meta">'
+    + '<span><span class="ico">&#127979;</span>' + item.grade + '</span>'
+    + '<span><span class="ico">&#128205;</span>' + esc(item.location) + '</span>'
+    + '<span><span class="ico">&#128187;</span>' + esc(item.mode) + '</span>'
+    + '<span><span class="ico">&#128178;</span>¥' + item.price + '/小时</span>'
+    + (item.edu ? '<span><span class="ico">&#127891;</span>' + esc(item.edu) + '</span>' : '')
+    + '</div>'
+    + '<div class="card-desc">' + esc(item.desc || '暂无介绍') + '</div>'
+    + '<div class="card-footer">'
+    + '<span class="card-time">' + timeAgo(item.time) + '</span>'
+    + '<button class="contact-btn contact-item-btn" data-id="' + item.id + '">联系TA</button>'
+    + (isAdmin
+      ? '<button class="edit-btn admin-action-btn" data-id="' + item.id + '">编辑</button>'
+      + '<button class="delete-btn admin-action-btn" data-id="' + item.id + '">删除</button>'
+      : '')
+    + '</div></div>';
+  }).join('');
+
+  // === 事件委托：卡片点击 + 联系按钮 ===
+  container.querySelectorAll('.card').forEach(function(card) {
+    card.addEventListener('click', function() { showDetail(parseInt(card.dataset.id)); });
+  });
+  container.querySelectorAll('.contact-item-btn').forEach(function(btn) {
+    btn.addEventListener('click', function(e) { e.stopPropagation(); contactItem(parseInt(btn.dataset.id)); });
+  });
+  // 管理模式：编辑/删除按钮
+  container.querySelectorAll('.edit-btn').forEach(function(btn) {
+    btn.addEventListener('click', function(e) { e.stopPropagation(); editItem(parseInt(btn.dataset.id)); });
+  });
+  container.querySelectorAll('.delete-btn').forEach(function(btn) {
+    btn.addEventListener('click', function(e) { e.stopPropagation(); deleteItem(parseInt(btn.dataset.id)); });
+  });
+}
+
+function esc(s) {
+  if (!s) return '';
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function timeAgo(ts) {
+  var s = Math.floor((Date.now() - ts) / 1000);
+  if (s < 60) return '刚刚';
+  if (s < 3600) return Math.floor(s/60) + ' 分钟前';
+  if (s < 86400) return Math.floor(s/3600) + ' 小时前';
+  return Math.floor(s/86400) + ' 天前';
+}
+
+function contactItem(id) {
+  var item = cachedData.find(function(d){ return d.id === id; });
+  if (item) showToast('联系方式：' + item.contact);
+}
+
+function showDetail(id) {
+  var item = cachedData.find(function(d){ return d.id === id; });
+  if (!item) return;
+  showToast('联系方式：' + item.contact);
+}
+
+// ========== MODAL（全部改用 addEventListener）==========
+var overlay = document.getElementById('overlay');
+
+function openModal() {
+  overlay.classList.add('show');
+  document.getElementById('postForm').reset();
+  document.querySelectorAll('.subject-chip').forEach(function(c){ c.classList.remove('selected'); });
+  setRole('teacher');
+}
+
+function closeModal() {
+  overlay.classList.remove('show');
+}
+
+function setRole(role) {
+  currentRole = role;
+  document.getElementById('roleTeacher').className = 'role-btn' + (role === 'teacher' ? ' active-teacher' : '');
+  document.getElementById('roleStudent').className = 'role-btn' + (role === 'student' ? ' active-student' : '');
+  document.getElementById('gradeLabel').textContent = role === 'teacher' ? '擅长年级' : '学生年级';
+  document.getElementById('priceLabel').textContent = role === 'teacher' ? '期望薪资 (元/小时)' : '预算 (元/小时)';
+  document.getElementById('grp_edu').style.display = role === 'teacher' ? '' : 'none';
+}
+
+function toggleChip(el) {
+  el.classList.toggle('selected');
+}
+
+async function handleFormSubmit(e) {
+  e.preventDefault();
+  var chips = [].slice.call(document.querySelectorAll('.subject-chip.selected')).map(function(c){ return c.textContent; });
+  if (chips.length === 0) { showToast('请至少选择一个科目'); return; }
+  if (!supabase) { showToast('数据库未连接，请刷新页面重试'); return; }
+
+  var payload = {
+    role: currentRole,
+    name: document.getElementById('f_name').value.trim(),
+    gender: document.getElementById('f_gender').value,
+    subjects: chips,
+    grade: document.getElementById('f_grade').value,
+    mode: document.getElementById('f_mode').value,
+    location: document.getElementById('f_location').value.trim(),
+    price: parseInt(document.getElementById('f_price').value) || 0,
+    edu: document.getElementById('f_edu').value.trim(),
+    contact: document.getElementById('f_contact').value.trim(),
+    description: document.getElementById('f_desc').value.trim(),
+    urgent: false
+  };
+
+  try {
+    var result = await supabase.from('tutors').insert(payload);
+    if (result.error) { showToast('发布失败：' + result.error.message); return; }
+  } catch(err) {
+    showToast('发布失败：' + err.message);
+    return;
+  }
+
+  overlay.classList.remove('show');
+  await renderCards();
+  showToast('发布成功！数据已同步到云端');
+}
+
+// ========== TOAST ==========
+function showToast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(function(){ t.classList.remove('show'); }, 2800);
+}
+
+// ========== 统一事件绑定（不再依赖 inline onclick）==========
+function bindAll() {
+  // 发布按钮
+  var postBtn = document.querySelector('.post-btn');
+  if (postBtn) postBtn.addEventListener('click', openModal);
+
+  // 弹窗关闭按钮 + 点击遮罩关闭
+  var closeBtn = document.querySelector('.modal-close');
+  if (closeBtn) closeBtn.addEventListener('click', closeModal);
+  overlay.addEventListener('click', function(e) { if (e.target === overlay) closeModal(); });
+
+  // 角色切换
+  var roleT = document.getElementById('roleTeacher');
+  var roleS = document.getElementById('roleStudent');
+  if (roleT) roleT.addEventListener('click', function(){ setRole('teacher'); });
+  if (roleS) roleS.addEventListener('click', function(){ setRole('student'); });
+
+  // 科目选择
+  document.querySelectorAll('.subject-chip').forEach(function(c){
+    c.addEventListener('click', function(){ toggleChip(c); });
+  });
+
+  // 表单提交
+  var form = document.getElementById('postForm');
+  if (form) form.addEventListener('submit', handleFormSubmit);
+
+  // 取消按钮
+  var cancelBtn = document.querySelector('.btn-cancel');
+  if (cancelBtn) cancelBtn.addEventListener('click', closeModal);
+
+  // Tab 切换
+  document.querySelectorAll('.tab-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){ switchTab(btn); });
+  });
+
+  // 筛选
+  document.querySelectorAll('.filter-type, .filter-subject, .filter-mode').forEach(function(el){
+    el.addEventListener('change', renderCards);
+  });
+
+  // 排序
+  var sortSel = document.getElementById('sortSelect');
+  if (sortSel) sortSel.addEventListener('change', renderCards);
+
+  // 搜索
+  var searchInput = document.getElementById('searchInput');
+  if (searchInput) searchInput.addEventListener('input', function() { renderCards(); });
+  var searchBtn = document.getElementById('searchBtn');
+  if (searchBtn) searchBtn.addEventListener('click', renderCards);
+
+  // 年级筛选
+  var gradeFilter = document.getElementById('gradeFilter');
+  if (gradeFilter) gradeFilter.addEventListener('change', renderCards);
+}
+
+// ========== 管理功能 ==========
+var isAdmin = false;
+var ADMIN_DEFAULT_PWD = 'admin123';
+var editingId = null;
+
+// 管理员密码（首次使用默认密码，之后可在管理模式下修改）
+function getAdminPassword() {
+  return localStorage.getItem('tutor_admin_pwd') || ADMIN_DEFAULT_PWD;
+}
+function setAdminPassword(pwd) {
+  localStorage.setItem('tutor_admin_pwd', pwd);
+}
+
+// 打开管理密码弹窗
+function showAdminLogin() {
+  document.getElementById('adminPassword').value = '';
+  document.getElementById('adminOverlay').classList.add('show');
+  setTimeout(function(){ document.getElementById('adminPassword').focus(); }, 100);
+}
+function hideAdminLogin() {
+  document.getElementById('adminOverlay').classList.remove('show');
+}
+
+// 进入管理模式
+function enterAdminMode() {
+  isAdmin = true;
+  document.getElementById('adminToggle').classList.add('active');
+  document.getElementById('adminToggle').textContent = '\u2699 退出管理';
+  renderCards();
+  showToast('已进入管理模式，可编辑和删除信息');
+}
+
+function exitAdminMode() {
+  isAdmin = false;
+  editingId = null;
+  document.getElementById('adminToggle').classList.remove('active');
+  document.getElementById('adminToggle').textContent = '\u2699 管理';
+  document.getElementById('editOverlay').classList.remove('show');
+  renderCards();
+  showToast('已退出管理模式');
+}
+
+// 修改管理密码
+function changeAdminPwd() {
+  var newPwd = prompt('请输入新管理密码（最少3位）：');
+  if (!newPwd || newPwd.length < 3) { showToast('密码至少3位，未修改'); return; }
+  setAdminPassword(newPwd);
+  showToast('管理密码已更新！');
+}
+
+// 编辑信息
+function editItem(id) {
+  var item = cachedData.find(function(d){ return d.id === id; });
+  if (!item) return;
+  editingId = id;
+
+  // 设置角色
+  setEditRole(item.role);
+
+  // 填充字段
+  document.getElementById('edit_name').value = item.name || '';
+  document.getElementById('edit_gender').value = item.gender || '';
+  document.getElementById('edit_grade').value = item.grade || '';
+  document.getElementById('edit_mode').value = item.mode || '';
+  document.getElementById('edit_location').value = item.location || '';
+  document.getElementById('edit_price').value = item.price || '';
+  document.getElementById('edit_edu').value = item.edu || '';
+  document.getElementById('edit_contact').value = item.contact || '';
+  document.getElementById('edit_desc').value = item.desc || '';
+
+  // 科目 chips
+  document.querySelectorAll('#editSubjectChips .subject-chip').forEach(function(c){
+    c.classList.toggle('selected', item.subjects && item.subjects.includes(c.textContent));
+  });
+
+  document.getElementById('editOverlay').classList.add('show');
+}
+
+function setEditRole(role) {
+  document.getElementById('editRoleTeacher').className = 'role-btn' + (role === 'teacher' ? ' active-teacher' : '');
+  document.getElementById('editRoleStudent').className = 'role-btn' + (role === 'student' ? ' active-student' : '');
+  document.getElementById('editGradeLabel').textContent = role === 'teacher' ? '擅长年级' : '学生年级';
+  document.getElementById('editPriceLabel').textContent = role === 'teacher' ? '期望薪资 (元/小时)' : '预算 (元/小时)';
+  document.getElementById('edit_grp_edu').style.display = role === 'teacher' ? '' : 'none';
+}
+
+// 保存编辑
+async function saveEdit(e) {
+  e.preventDefault();
+  if (!supabase) { showToast('数据库未连接'); return; }
+  if (!editingId) { showToast('编辑状态异常，请刷新'); return; }
+
+  var chips = [].slice.call(document.querySelectorAll('#editSubjectChips .subject-chip.selected')).map(function(c){ return c.textContent; });
+  if (chips.length === 0) { showToast('请至少选择一个科目'); return; }
+
+  var item = cachedData.find(function(d){ return d.id === editingId; });
+  var role = document.getElementById('editRoleTeacher').classList.contains('active-teacher') ? 'teacher' : 'student';
+
+  var payload = {
+    role: role,
+    name: document.getElementById('edit_name').value.trim(),
+    gender: document.getElementById('edit_gender').value,
+    subjects: chips,
+    grade: document.getElementById('edit_grade').value,
+    mode: document.getElementById('edit_mode').value,
+    location: document.getElementById('edit_location').value.trim(),
+    price: parseInt(document.getElementById('edit_price').value) || 0,
+    edu: document.getElementById('edit_edu').value.trim(),
+    contact: document.getElementById('edit_contact').value.trim(),
+    description: document.getElementById('edit_desc').value.trim()
+  };
+
+  try {
+    var result = await supabase.from('tutors').update(payload).eq('id', editingId);
+    if (result.error) { showToast('保存失败：' + result.error.message); return; }
+  } catch(err) {
+    showToast('保存失败：' + err.message);
+    return;
+  }
+
+  document.getElementById('editOverlay').classList.remove('show');
+  editingId = null;
+  await renderCards();
+  showToast('信息已更新！');
+}
+
+// 删除信息
+async function deleteItem(id) {
+  if (!confirm('确定要删除这条信息吗？此操作不可撤销。')) return;
+  if (!supabase) { showToast('数据库未连接'); return; }
+
+  try {
+    var result = await supabase.from('tutors').delete().eq('id', id);
+    if (result.error) { showToast('删除失败：' + result.error.message); return; }
+  } catch(err) {
+    showToast('删除失败：' + err.message);
+    return;
+  }
+
+  await renderCards();
+  showToast('信息已删除');
+}
+
+// ========== INIT ==========
+bindAll();
+
+// 管理功能事件绑定
+(function bindAdmin() {
+  var adminToggle = document.getElementById('adminToggle');
+  if (adminToggle) adminToggle.addEventListener('click', function() {
+    if (isAdmin) { exitAdminMode(); return; }
+    showAdminLogin();
+  });
+
+  // 管理员密码弹窗
+  document.getElementById('adminCancel').addEventListener('click', hideAdminLogin);
+  document.getElementById('adminOverlay').addEventListener('click', function(e) {
+    if (e.target === document.getElementById('adminOverlay')) hideAdminLogin();
+  });
+  document.getElementById('adminConfirm').addEventListener('click', function() {
+    var input = document.getElementById('adminPassword').value;
+    if (input === getAdminPassword()) {
+      hideAdminLogin();
+      enterAdminMode();
+    } else {
+      showToast('密码错误，请重试');
+      document.getElementById('adminPassword').value = '';
+    }
+  });
+  document.getElementById('adminPassword').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') document.getElementById('adminConfirm').click();
+  });
+
+  // 编辑弹窗事件
+  var editOverlay = document.getElementById('editOverlay');
+  document.getElementById('editCloseBtn').addEventListener('click', function() {
+    editOverlay.classList.remove('show'); editingId = null;
+  });
+  editOverlay.addEventListener('click', function(e) {
+    if (e.target === editOverlay) { editOverlay.classList.remove('show'); editingId = null; }
+  });
+  document.getElementById('editCancel').addEventListener('click', function() {
+    editOverlay.classList.remove('show'); editingId = null;
+  });
+  document.getElementById('editForm').addEventListener('submit', saveEdit);
+
+  // 编辑弹窗角色切换
+  document.getElementById('editRoleTeacher').addEventListener('click', function(){ setEditRole('teacher'); });
+  document.getElementById('editRoleStudent').addEventListener('click', function(){ setEditRole('student'); });
+
+  // 编辑弹窗科目选择
+  document.querySelectorAll('#editSubjectChips .subject-chip').forEach(function(c) {
+    c.addEventListener('click', function(){ c.classList.toggle('selected'); });
+  });
+
+  // 关闭编辑弹窗快捷键
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      if (editOverlay.classList.contains('show')) { editOverlay.classList.remove('show'); editingId = null; }
+      if (document.getElementById('adminOverlay').classList.contains('show')) hideAdminLogin();
+    }
+  });
+
+  // 修改密码功能：双击管理按钮
+  if (adminToggle) adminToggle.addEventListener('dblclick', function() {
+    if (!isAdmin) return;
+    changeAdminPwd();
+  });
+})();
+
+renderCards();
+
+})();
+</script>
+
+</body>
+</html>
