@@ -3,23 +3,61 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>家教信息平台</title>
+<meta name="description" content="家教信息平台 - 免费发布家教求职与招聘信息，发现好老师，找到好学生">
+<meta name="theme-color" content="#534AB7">
+<meta property="og:title" content="家教信息平台">
+<meta property="og:description" content="免费发布家教求职与招聘信息">
+<meta property="og:type" content="website">
+<title>家教信息平台 - 发现好老师，找到好学生</title>
 <style>
+  /* ============ CSS CUSTOM PROPERTIES ============ */
+  :root {
+    --color-primary: #534AB7;
+    --color-primary-hover: #3C3489;
+    --color-primary-light: #EEEDFE;
+    --color-success: #0F6E56;
+    --color-success-light: #E1F5EE;
+    --color-danger: #d93025;
+    --color-danger-light: #FCE8E6;
+    --color-warning: #993C1D;
+    --color-warning-light: #FAECE7;
+    --color-text: #2c2c2a;
+    --color-text-secondary: #666;
+    --color-text-muted: #888;
+    --color-bg: #f7f6f3;
+    --color-surface: #fff;
+    --color-border: #e8e7e0;
+    --color-border-light: #f0efe8;
+    --radius-sm: 6px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --radius-xl: 16px;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+    --shadow-md: 0 4px 16px rgba(0,0,0,0.07);
+    --shadow-lg: 0 8px 32px rgba(0,0,0,0.10);
+    --transition-fast: 0.15s ease;
+    --transition-smooth: 0.25s cubic-bezier(0.4,0,0.2,1);
+    --font-sans: system-ui, -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+  }
+
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   body {
-    font-family: system-ui, -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
-    background: #f7f6f3;
-    color: #2c2c2a;
+    font-family: var(--font-sans);
+    background: var(--color-bg);
+    color: var(--color-text);
     font-size: 14px;
     line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    scroll-behavior: smooth;
   }
+  body.sidebar-open { overflow: hidden; }
 
-  /* ===== HEADER ===== */
+  /* ============ HEADER ============ */
   header {
-    background: #fff;
-    border-bottom: 1px solid #e8e7e0;
-    padding: 0 24px;
+    background: var(--color-surface);
+    border-bottom: 1px solid var(--color-border);
+    padding: 0 max(20px, 4vw);
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -27,344 +65,470 @@
     position: sticky;
     top: 0;
     z-index: 100;
+    gap: 12px;
   }
-  header .logo {
+  .header-left { display: flex; align-items: center; gap: 12px; }
+  .logo {
     display: flex; align-items: center; gap: 8px;
-    font-size: 18px; font-weight: 500; color: #3C3489;
+    font-size: 18px; font-weight: 600; color: var(--color-primary);
+    text-decoration: none;
   }
-  header .logo .icon { font-size: 22px; }
-  header .post-btn {
-    background: #534AB7;
-    color: #fff;
-    border: none;
-    padding: 8px 20px;
-    border-radius: 8px;
-    font-size: 14px;
-    cursor: pointer;
-    font-weight: 500;
-    transition: background 0.15s;
-  }
-  header .post-btn:hover { background: #3C3489; }
-  header .admin-btn {
-    background: transparent;
-    color: #888;
-    border: 1px solid #ddd;
-    padding: 8px 16px;
-    border-radius: 8px;
-    font-size: 14px;
-    cursor: pointer;
-    transition: all 0.15s;
-  }
-  header .admin-btn:hover { border-color: #534AB7; color: #534AB7; }
-  header .admin-btn.active { background: #534AB7; color: #fff; border-color: #534AB7; }
+  .logo .icon { font-size: 22px; }
+  .header-actions { display: flex; gap: 8px; align-items: center; }
 
-  /* ===== MAIN LAYOUT ===== */
-  .container { max-width: 1100px; margin: 0 auto; padding: 24px 20px; }
+  .btn {
+    padding: 8px 16px; border-radius: var(--radius-md);
+    font-size: 14px; font-weight: 500; cursor: pointer;
+    border: none; font-family: inherit;
+    transition: all var(--transition-fast);
+    display: inline-flex; align-items: center; gap: 6px;
+    white-space: nowrap;
+    outline-offset: 2px;
+  }
+  .btn:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; }
+  .btn-primary { background: var(--color-primary); color: #fff; }
+  .btn-primary:hover { background: var(--color-primary-hover); transform: translateY(-1px); box-shadow: var(--shadow-sm); }
+  .btn-ghost { background: transparent; color: var(--color-text-muted); border: 1px solid #ddd; }
+  .btn-ghost:hover { border-color: var(--color-primary); color: var(--color-primary); }
+  .btn-ghost.active { background: var(--color-primary); color: #fff; border-color: var(--color-primary); }
 
+  .hamburger { display: none; width: 40px; height: 40px; padding: 8px; background: none; border: none; cursor: pointer; border-radius: var(--radius-md); }
+  .hamburger:hover { background: #f0f0f0; }
+  .hamburger span { display: block; width: 24px; height: 2px; background: var(--color-text); margin: 5px 0; transition: var(--transition-smooth); }
+  .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+  .hamburger.open span:nth-child(2) { opacity: 0; }
+  .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+  /* ============ HERO ============ */
+  .hero {
+    background: linear-gradient(135deg, var(--color-primary) 0%, #6C63FF 50%, #4A90D9 100%);
+    color: #fff; padding: clamp(32px, 5vw, 56px) max(20px, 4vw);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(circle at 20% 50%, rgba(255,255,255,0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 50%, rgba(255,255,255,0.08) 0%, transparent 50%);
+    pointer-events: none;
+  }
+  .hero h1 { font-size: clamp(24px, 4vw, 36px); font-weight: 700; margin-bottom: 8px; position: relative; }
+  .hero p { font-size: clamp(14px, 2vw, 17px); opacity: 0.9; max-width: 600px; margin: 0 auto 20px; position: relative; }
+  .hero .btn-hero {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 12px 32px; background: #fff; color: var(--color-primary);
+    border-radius: var(--radius-lg); font-size: 15px; font-weight: 600;
+    text-decoration: none; border: none; cursor: pointer;
+    transition: all var(--transition-smooth);
+    position: relative;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+  }
+  .hero .btn-hero:hover { transform: translateY(-2px); box-shadow: 0 6px 28px rgba(0,0,0,0.22); }
+
+  /* ============ STATS BAR ============ */
+  .stats-bar {
+    display: flex; justify-content: center; gap: clamp(16px, 3vw, 40px);
+    padding: 16px 20px; background: var(--color-surface);
+    border-bottom: 1px solid var(--color-border);
+    flex-wrap: wrap;
+  }
+  .stat-item { text-align: center; }
+  .stat-num { font-size: clamp(20px, 3vw, 26px); font-weight: 700; color: var(--color-primary); line-height: 1.2; }
+  .stat-label { font-size: 12px; color: var(--color-text-muted); }
+
+  /* ============ MAIN LAYOUT ============ */
+  .container { max-width: 1140px; margin: 0 auto; padding: 20px max(16px, 3vw); }
   .layout { display: flex; gap: 24px; }
 
-  /* ===== SIDEBAR ===== */
+  /* ============ SIDEBAR ============ */
   .sidebar { width: 240px; flex-shrink: 0; }
+  .sidebar-overlay { display: none; }
 
   .filter-card {
-    background: #fff;
-    border-radius: 12px;
-    border: 1px solid #e8e7e0;
-    padding: 18px;
-    margin-bottom: 16px;
+    background: var(--color-surface);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-border);
+    padding: 16px;
+    margin-bottom: 14px;
+    contain: layout style;
   }
   .filter-card h3 {
-    font-size: 13px;
-    font-weight: 500;
-    color: #888780;
-    margin-bottom: 12px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+    font-size: 12px; font-weight: 600; color: var(--color-text-muted);
+    margin-bottom: 10px; letter-spacing: 0.5px; text-transform: uppercase;
   }
-  .filter-group { margin-bottom: 10px; }
+  .filter-group { margin-bottom: 6px; }
   .filter-group label {
     display: flex; align-items: center; gap: 8px;
-    cursor: pointer; font-size: 13px; color: #444;
-    padding: 4px 0;
+    cursor: pointer; font-size: 13px; color: #444; padding: 4px 0;
+    border-radius: var(--radius-sm); transition: color var(--transition-fast);
+    min-height: 32px;
   }
-  .filter-group label input[type="checkbox"] { accent-color: #534AB7; width: 15px; height: 15px; }
-  .filter-group label:hover { color: #534AB7; }
-
+  .filter-group label:hover { color: var(--color-primary); }
+  .filter-group label input[type="checkbox"] { accent-color: var(--color-primary); width: 16px; height: 16px; flex-shrink: 0; }
   .filter-card select {
-    width: 100%; padding: 7px 10px;
-    border: 1px solid #ddd; border-radius: 8px;
-    font-size: 13px; color: #333;
-    background: #fff; cursor: pointer;
-    outline: none;
+    width: 100%; padding: 8px 10px; border: 1px solid #ddd;
+    border-radius: var(--radius-md); font-size: 13px; color: #333;
+    background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23888' d='M6 8L1 3h10z'/%3E%3C/svg%3E") right 10px center no-repeat;
+    cursor: pointer; outline: none; appearance: none; -webkit-appearance: none;
   }
-  .filter-card select:focus { border-color: #534AB7; }
+  .filter-card select:focus { border-color: var(--color-primary); box-shadow: 0 0 0 3px var(--color-primary-light); }
 
-  /* ===== MAIN CONTENT ===== */
+  /* ============ MAIN CONTENT ============ */
   .main-content { flex: 1; min-width: 0; }
 
-  .search-bar {
-    display: flex; gap: 10px; margin-bottom: 20px;
-  }
+  .search-bar { display: flex; gap: 10px; margin-bottom: 16px; }
   .search-bar input {
-    flex: 1; padding: 10px 16px;
-    border: 1px solid #ddd; border-radius: 8px;
-    font-size: 14px; outline: none;
-    transition: border-color 0.15s;
+    flex: 1; padding: 10px 16px; border: 1px solid #ddd;
+    border-radius: var(--radius-md); font-size: 14px; outline: none;
+    transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+    background: var(--color-surface);
   }
-  .search-bar input:focus { border-color: #534AB7; }
-  .search-bar button {
-    padding: 10px 20px;
-    background: #534AB7; color: #fff;
-    border: none; border-radius: 8px;
-    font-size: 14px; cursor: pointer; font-weight: 500;
-    transition: background 0.15s;
-  }
-  .search-bar button:hover { background: #3C3489; }
+  .search-bar input:focus { border-color: var(--color-primary); box-shadow: 0 0 0 3px var(--color-primary-light); }
 
+  /* ============ TABS ============ */
   .tabs {
-    display: flex; gap: 4px; margin-bottom: 16px;
-    background: #fff; padding: 5px;
-    border-radius: 10px; border: 1px solid #e8e7e0;
+    display: flex; gap: 4px; margin-bottom: 14px;
+    background: var(--color-surface); padding: 5px;
+    border-radius: 10px; border: 1px solid var(--color-border);
     width: fit-content;
   }
   .tab-btn {
-    padding: 7px 20px; border: none;
-    border-radius: 7px; cursor: pointer;
-    font-size: 13px; font-weight: 500;
-    background: transparent; color: #888;
-    transition: all 0.15s;
+    padding: 7px 18px; border: none; border-radius: 7px;
+    cursor: pointer; font-size: 13px; font-weight: 500;
+    background: transparent; color: var(--color-text-muted);
+    transition: all var(--transition-fast); font-family: inherit;
+    outline-offset: 2px;
   }
-  .tab-btn.active { background: #EEEDFE; color: #534AB7; }
+  .tab-btn:focus-visible { outline: 2px solid var(--color-primary); }
+  .tab-btn.active { background: var(--color-primary-light); color: var(--color-primary); }
   .tab-btn:hover:not(.active) { background: #f5f5f0; }
 
-  .sort-row {
-    display: flex; align-items: center;
-    gap: 8px; margin-bottom: 14px;
-    font-size: 13px; color: #888;
+  .toolbar {
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 14px; font-size: 13px; color: var(--color-text-muted);
+    flex-wrap: wrap;
   }
-  .sort-row select {
-    border: 1px solid #ddd; border-radius: 6px;
-    padding: 4px 8px; font-size: 13px;
-    background: #fff; cursor: pointer; outline: none;
+  .toolbar select {
+    border: 1px solid #ddd; border-radius: var(--radius-sm);
+    padding: 5px 24px 5px 8px; font-size: 13px;
+    background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath fill='%23888' d='M5 7L1 3h8z'/%3E%3C/svg%3E") right 8px center no-repeat;
+    cursor: pointer; outline: none; appearance: none; -webkit-appearance: none;
   }
+  .toolbar .count { margin-left: auto; color: var(--color-text-muted); }
+  .toolbar .loading-indicator {
+    display: none; width: 16px; height: 16px; border: 2px solid #ddd;
+    border-top-color: var(--color-primary); border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+  }
+  .toolbar .loading-indicator.show { display: inline-block; }
+  @keyframes spin { to { transform: rotate(360deg); } }
 
-  /* ===== CARD ===== */
-  .card-list { display: flex; flex-direction: column; gap: 12px; }
+  /* ============ CARDS ============ */
+  .card-list { display: flex; flex-direction: column; gap: 12px; min-height: 200px; }
 
   .card {
-    background: #fff;
-    border-radius: 12px;
-    border: 1px solid #e8e7e0;
-    padding: 20px;
-    transition: box-shadow 0.15s, border-color 0.15s;
+    background: var(--color-surface); border-radius: var(--radius-lg);
+    border: 1px solid var(--color-border); padding: 20px;
+    transition: box-shadow var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast);
     cursor: pointer;
+    animation: cardIn var(--transition-smooth) ease both;
+    contain: layout style paint;
   }
-  .card:hover {
-    box-shadow: 0 4px 16px rgba(0,0,0,0.07);
-    border-color: #c5c3e8;
+  @keyframes cardIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
   }
-  .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
-  .card-title {
-    font-size: 15px; font-weight: 500; color: #2c2c2a;
-    margin-right: 12px;
-  }
+  .card:nth-child(1) { animation-delay: 0s; }
+  .card:nth-child(2) { animation-delay: 0.04s; }
+  .card:nth-child(3) { animation-delay: 0.08s; }
+  .card:nth-child(4) { animation-delay: 0.12s; }
+  .card:nth-child(5) { animation-delay: 0.16s; }
+  .card:hover { box-shadow: var(--shadow-md); border-color: #c5c3e8; transform: translateY(-1px); }
+  .card:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; }
+
+  .card-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; margin-bottom: 10px; }
+  .card-title { font-size: 15px; font-weight: 600; color: var(--color-text); word-break: break-word; }
   .tag {
-    display: inline-block;
-    padding: 2px 10px; border-radius: 20px;
-    font-size: 12px; font-weight: 500;
-    white-space: nowrap;
+    display: inline-flex; align-items: center; padding: 2px 10px;
+    border-radius: 20px; font-size: 12px; font-weight: 600;
+    white-space: nowrap; line-height: 1.6;
   }
-  .tag-teacher { background: #EEEDFE; color: #534AB7; }
-  .tag-student { background: #E1F5EE; color: #0F6E56; }
-  .tag-urgent { background: #FAECE7; color: #993C1D; }
+  .tag-teacher { background: var(--color-primary-light); color: var(--color-primary); }
+  .tag-student { background: var(--color-success-light); color: var(--color-success); }
+  .tag-urgent { background: var(--color-warning-light); color: var(--color-warning); }
 
   .card-meta {
     display: flex; flex-wrap: wrap; gap: 14px;
-    font-size: 13px; color: #666;
-    margin-bottom: 10px;
+    font-size: 13px; color: var(--color-text-secondary); margin-bottom: 10px;
   }
   .card-meta span { display: flex; align-items: center; gap: 4px; }
-  .card-meta .ico { font-size: 14px; }
+  .card-meta .ico { font-size: 14px; line-height: 1; }
 
   .card-desc {
-    font-size: 13px; color: #888;
+    font-size: 13px; color: var(--color-text-muted);
     display: -webkit-box; -webkit-line-clamp: 2;
     -webkit-box-orient: vertical; overflow: hidden;
+    word-break: break-word;
   }
   .card-footer {
     display: flex; justify-content: space-between; align-items: center;
-    margin-top: 14px; padding-top: 12px;
-    border-top: 1px solid #f0efe8;
+    gap: 8px; margin-top: 14px; padding-top: 12px;
+    border-top: 1px solid var(--color-border-light);
+    flex-wrap: wrap;
   }
   .card-time { font-size: 12px; color: #aaa; }
-  .contact-btn {
-    padding: 6px 16px;
-    background: #534AB7; color: #fff;
-    border: none; border-radius: 6px;
-    font-size: 13px; cursor: pointer;
-    transition: background 0.15s;
-  }
-  .contact-btn:hover { background: #3C3489; }
-  .admin-action-btn {
-    padding: 6px 12px;
-    border: none; border-radius: 6px;
-    font-size: 12px; cursor: pointer;
-    transition: background 0.15s;
-  }
-  .edit-btn {
-    background: #E8F0FE; color: #1a73e8;
-  }
-  .edit-btn:hover { background: #D2E3FC; }
-  .delete-btn {
-    background: #FCE8E6; color: #d93025;
-  }
-  .delete-btn:hover { background: #F8D7DA; }
+  .card-actions { display: flex; gap: 6px; flex-wrap: wrap; }
 
-  /* ===== EMPTY STATE ===== */
+  .btn-sm {
+    padding: 6px 14px; border: none; border-radius: var(--radius-sm);
+    font-size: 13px; cursor: pointer; font-family: inherit; font-weight: 500;
+    transition: all var(--transition-fast);
+    min-height: 32px; min-width: 44px;
+  }
+  .btn-contact { background: var(--color-primary); color: #fff; }
+  .btn-contact:hover { background: var(--color-primary-hover); }
+  .btn-edit { background: #E8F0FE; color: #1a73e8; }
+  .btn-edit:hover { background: #D2E3FC; }
+  .btn-delete { background: var(--color-danger-light); color: var(--color-danger); }
+  .btn-delete:hover { background: #F8D7DA; }
+
+  /* ============ SKELETON ============ */
+  .skeleton { background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: var(--radius-md); }
+  @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+  .sk-card { background: var(--color-surface); border-radius: var(--radius-lg); border: 1px solid var(--color-border); padding: 20px; display: flex; flex-direction: column; gap: 12px; }
+  .sk-title { height: 18px; width: 70%; }
+  .sk-row { height: 14px; width: 50%; }
+  .sk-desc { height: 14px; width: 90%; }
+
+  /* ============ EMPTY STATE ============ */
   .empty {
-    text-align: center; padding: 60px 20px;
-    color: #aaa; font-size: 14px;
+    text-align: center; padding: 60px 20px; color: #aaa; font-size: 14px;
   }
-  .empty .empty-icon { font-size: 48px; margin-bottom: 16px; }
+  .empty-icon { font-size: 48px; margin-bottom: 16px; display: block; }
 
-  /* ===== MODAL OVERLAY ===== */
+  /* ============ MODAL (shared) ============ */
   .overlay {
     display: none; position: fixed; inset: 0;
-    background: rgba(0,0,0,0.25);
-    z-index: 200;
-    justify-content: center;
-    align-items: center;
-    padding: 20px;
+    background: rgba(0,0,0,0.3); z-index: 200;
+    justify-content: center; align-items: center; padding: 20px;
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+    animation: fadeIn 0.2s ease;
   }
   .overlay.show { display: flex; }
 
-  /* ===== MODAL ===== */
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
   .modal {
-    background: #fff; border-radius: 16px;
-    width: 100%; max-width: 560px;
-    max-height: 90vh; overflow-y: auto;
-    padding: 28px;
-    position: relative;
+    background: var(--color-surface); border-radius: var(--radius-xl);
+    width: 100%; max-width: 560px; max-height: 90vh;
+    overflow-y: auto; padding: 28px;
+    box-shadow: var(--shadow-lg);
+    animation: slideUp 0.25s ease;
+    overscroll-behavior: contain;
   }
   .modal-header {
-    display: flex; justify-content: space-between; align-items: center;
-    margin-bottom: 24px;
+    display: flex; justify-content: space-between; align-items: center; margin-bottom: 22px;
   }
-  .modal-header h2 { font-size: 17px; font-weight: 500; }
+  .modal-header h2 { font-size: 18px; font-weight: 600; }
   .modal-close {
-    width: 32px; height: 32px; border-radius: 8px;
-    border: 1px solid #e0e0e0; background: #fff;
-    cursor: pointer; font-size: 16px;
-    display: flex; align-items: center; justify-content: center;
-    color: #666; transition: all 0.15s;
+    width: 36px; height: 36px; border-radius: var(--radius-md);
+    border: 1px solid #e0e0e0; background: var(--color-surface);
+    cursor: pointer; font-size: 16px; display: flex;
+    align-items: center; justify-content: center;
+    color: var(--color-text-secondary); transition: all var(--transition-fast);
   }
   .modal-close:hover { background: #f5f5f0; border-color: #ccc; }
 
-  .form-group { margin-bottom: 18px; }
+  /* ============ FORM ============ */
+  .form-group { margin-bottom: 16px; }
   .form-group label {
-    display: block; font-size: 13px;
-    font-weight: 500; color: #555;
-    margin-bottom: 6px;
+    display: block; font-size: 13px; font-weight: 600; color: #555; margin-bottom: 6px;
   }
-  .form-group label .req { color: #E24B4A; margin-left: 2px; }
-  .form-group input,
-  .form-group select,
-  .form-group textarea {
-    width: 100%; padding: 9px 12px;
-    border: 1px solid #ddd; border-radius: 8px;
-    font-size: 14px; outline: none;
-    transition: border-color 0.15s;
+  .form-group label .req { color: var(--color-danger); margin-left: 2px; }
+  .form-group input, .form-group select, .form-group textarea {
+    width: 100%; padding: 9px 12px; border: 1px solid #ddd;
+    border-radius: var(--radius-md); font-size: 14px; outline: none;
+    transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
     font-family: inherit;
   }
-  .form-group input:focus,
-  .form-group select:focus,
-  .form-group textarea:focus { border-color: #534AB7; }
+  .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px var(--color-primary-light);
+  }
   .form-group textarea { min-height: 80px; resize: vertical; }
-
   .form-row { display: flex; gap: 14px; }
-  .form-row .form-group { flex: 1; }
+  .form-row .form-group { flex: 1; min-width: 0; }
 
-  .role-toggle {
-    display: flex; gap: 8px;
-  }
+  .role-toggle { display: flex; gap: 8px; }
   .role-btn {
-    flex: 1; padding: 9px;
-    border: 1.5px solid #ddd; border-radius: 8px;
-    background: #fff; cursor: pointer;
-    font-size: 13px; font-weight: 500; color: #666;
-    transition: all 0.15s; text-align: center;
+    flex: 1; padding: 10px; border: 2px solid #ddd; border-radius: var(--radius-md);
+    background: var(--color-surface); cursor: pointer;
+    font-size: 13px; font-weight: 600; color: var(--color-text-secondary);
+    transition: all var(--transition-fast); text-align: center; font-family: inherit;
   }
-  .role-btn.active-teacher { border-color: #534AB7; background: #EEEDFE; color: #534AB7; }
-  .role-btn.active-student { border-color: #0F6E56; background: #E1F5EE; color: #0F6E56; }
+  .role-btn:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; }
+  .role-btn.active-teacher { border-color: var(--color-primary); background: var(--color-primary-light); color: var(--color-primary); }
+  .role-btn.active-student { border-color: var(--color-success); background: var(--color-success-light); color: var(--color-success); }
   .role-btn:hover:not(.active-teacher):not(.active-student) { border-color: #999; }
 
-  .subjects-grid {
-    display: flex; flex-wrap: wrap; gap: 8px;
-  }
+  .subjects-grid { display: flex; flex-wrap: wrap; gap: 8px; }
   .subject-chip {
-    padding: 5px 12px; border: 1.5px solid #ddd;
-    border-radius: 20px; cursor: pointer;
-    font-size: 13px; color: #555;
-    background: #fff; transition: all 0.15s;
+    padding: 6px 12px; border: 1.5px solid #ddd; border-radius: 20px;
+    cursor: pointer; font-size: 13px; color: #555;
+    background: var(--color-surface); transition: all var(--transition-fast);
     user-select: none;
   }
-  .subject-chip.selected { border-color: #534AB7; background: #EEEDFE; color: #534AB7; }
+  .subject-chip:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; }
+  .subject-chip.selected { border-color: var(--color-primary); background: var(--color-primary-light); color: var(--color-primary); }
+  .subject-chip:hover:not(.selected) { border-color: #bbb; background: #f9f9f9; }
 
   .form-footer {
     display: flex; justify-content: flex-end; gap: 10px;
-    margin-top: 24px; padding-top: 18px;
-    border-top: 1px solid #f0efe8;
+    margin-top: 22px; padding-top: 16px; border-top: 1px solid var(--color-border-light);
   }
   .btn-cancel {
-    padding: 9px 22px; border: 1px solid #ddd;
-    border-radius: 8px; background: #fff;
-    font-size: 14px; cursor: pointer; color: #666;
+    padding: 9px 22px; border: 1px solid #ddd; border-radius: var(--radius-md);
+    background: var(--color-surface); font-size: 14px; cursor: pointer;
+    color: var(--color-text-secondary); font-family: inherit;
+    transition: background var(--transition-fast);
   }
   .btn-cancel:hover { background: #f5f5f0; }
   .btn-submit {
-    padding: 9px 26px; background: #534AB7;
-    color: #fff; border: none; border-radius: 8px;
-    font-size: 14px; font-weight: 500; cursor: pointer;
-    transition: background 0.15s;
+    padding: 9px 26px; background: var(--color-primary);
+    color: #fff; border: none; border-radius: var(--radius-md);
+    font-size: 14px; font-weight: 600; cursor: pointer;
+    transition: all var(--transition-fast); font-family: inherit;
   }
-  .btn-submit:hover { background: #3C3489; }
+  .btn-submit:hover { background: var(--color-primary-hover); }
 
-  /* ===== TOAST ===== */
+  /* ============ TOAST ============ */
   .toast {
-    position: fixed; bottom: 30px; left: 50%;
-    transform: translateX(-50%);
-    background: #2c2c2a; color: #fff;
-    padding: 10px 22px; border-radius: 10px;
-    font-size: 14px; z-index: 500;
-    opacity: 0; transition: opacity 0.2s;
-    pointer-events: none;
+    position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+    background: var(--color-text); color: #fff;
+    padding: 12px 24px; border-radius: var(--radius-lg);
+    font-size: 14px; font-weight: 500; z-index: 500;
+    opacity: 0; transition: opacity 0.2s ease, transform 0.2s ease;
+    pointer-events: none; box-shadow: var(--shadow-lg);
+    transform: translateX(-50%) translateY(10px);
+    text-align: center; max-width: 90vw;
   }
-  .toast.show { opacity: 1; }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .toast.error { background: var(--color-danger); }
 
-  /* ===== RESPONSIVE ===== */
-  @media (max-width: 700px) {
-    .layout { flex-direction: column; }
-    .sidebar { width: 100%; }
+  /* ============ BACK-TO-TOP ============ */
+  .back-to-top {
+    position: fixed; bottom: 24px; right: 24px;
+    width: 44px; height: 44px; border-radius: 50%;
+    background: var(--color-primary); color: #fff; border: none;
+    font-size: 18px; cursor: pointer; box-shadow: var(--shadow-md);
+    display: none; align-items: center; justify-content: center;
+    transition: all var(--transition-fast); z-index: 50;
+  }
+  .back-to-top.show { display: flex; }
+  .back-to-top:hover { background: var(--color-primary-hover); transform: translateY(-2px); }
+
+  /* ============ ERROR BANNER ============ */
+  .error-banner {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 9999;
+    padding: 14px 20px; background: var(--color-danger);
+    color: #fff; font-size: 14px; text-align: center; font-weight: 500;
+  }
+
+  /* ============ RESPONSIVE ============ */
+  @media (max-width: 768px) {
+    header { padding: 0 16px; }
+    .logo { font-size: 16px; }
+    .hamburger { display: flex; flex-direction: column; align-items: center; justify-content: center; }
+
+    .hero { padding: 28px 16px; }
+    .hero h1 { font-size: 22px; }
+    .hero p { font-size: 14px; }
+
+    .layout { flex-direction: column; gap: 0; }
+
+    .sidebar {
+      position: fixed; top: 0; left: 0; bottom: 0;
+      width: 280px; background: var(--color-bg);
+      z-index: 300; padding: 20px;
+      overflow-y: auto;
+      transform: translateX(-100%);
+      transition: transform var(--transition-smooth);
+      box-shadow: var(--shadow-lg);
+    }
+    .sidebar.open { transform: translateX(0); }
+
+    .sidebar-overlay {
+      display: block; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.4); z-index: 299;
+      opacity: 0; pointer-events: none;
+      transition: opacity var(--transition-smooth);
+    }
+    .sidebar-overlay.open { opacity: 1; pointer-events: auto; }
+
     .form-row { flex-direction: column; gap: 0; }
+    .modal { max-width: 100%; margin: 0 8px; padding: 20px; border-radius: var(--radius-lg); }
+
+    .card-meta { gap: 10px; }
+    .card-footer { flex-direction: column; align-items: flex-start; }
+
+    .stats-bar { gap: 20px; }
+    .stat-item { min-width: 70px; }
+
+    .back-to-top { bottom: 16px; right: 16px; width: 40px; height: 40px; }
+    .hero .btn-hero { width: 100%; justify-content: center; }
+  }
+
+  @media (max-width: 400px) {
+    .btn { padding: 7px 12px; font-size: 13px; }
+    .header-actions { gap: 4px; }
+    .card { padding: 14px; }
   }
 </style>
 </head>
-<body>
+<body aria-label="家教信息平台">
 
-<header>
-  <div class="logo">
-    <span class="icon">&#127891;</span>
-    家教信息平台
+<!-- ============ HEADER ============ -->
+<header role="banner">
+  <div class="header-left">
+    <button class="hamburger" id="hamburger" aria-label="打开菜单" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+    <a class="logo" href="/" aria-label="家教信息平台首页">
+      <span class="icon">&#127891;</span> 家教平台
+    </a>
   </div>
-  <button class="post-btn">+ 发布信息</button>
-  <button class="admin-btn" id="adminToggle">&#9881; 管理</button>
+  <div class="header-actions">
+    <button class="btn btn-ghost" id="adminToggle" aria-label="管理">&#9881;</button>
+    <button class="btn btn-primary post-btn" aria-label="发布家教信息">+ 发布信息</button>
+  </div>
 </header>
+
+<!-- ============ HERO ============ -->
+<section class="hero" role="region" aria-label="欢迎横幅">
+  <h1>发现好老师，找到好学生</h1>
+  <p>免费发布家教求职与招聘信息，高效连接师生双方</p>
+  <button class="btn-hero post-btn-hero" aria-label="立即发布信息">&#9997; 立即发布信息</button>
+</section>
+
+<!-- ============ STATS ============ -->
+<div class="stats-bar" id="statsBar" role="region" aria-label="数据统计">
+  <div class="stat-item"><div class="stat-num" id="statTotal">--</div><div class="stat-label">信息总数</div></div>
+  <div class="stat-item"><div class="stat-num" id="statTeacher">--</div><div class="stat-label">老师求职</div></div>
+  <div class="stat-item"><div class="stat-num" id="statStudent">--</div><div class="stat-label">学生招聘</div></div>
+</div>
+
+<!-- ============ SIDEBAR OVERLAY (mobile) ============ -->
+<div class="sidebar-overlay" id="sidebarOverlay" aria-hidden="true"></div>
 
 <div class="container">
   <div class="layout">
 
-    <!-- ===== SIDEBAR ===== -->
-    <aside class="sidebar">
+    <!-- ============ SIDEBAR ============ -->
+    <aside class="sidebar" id="sidebar" role="complementary" aria-label="筛选条件">
       <div class="filter-card">
         <h3>类型</h3>
         <div class="filter-group">
@@ -395,13 +559,9 @@
 
       <div class="filter-card">
         <h3>年级</h3>
-        <select id="gradeFilter">
+        <select id="gradeFilter" aria-label="按年级筛选">
           <option value="">全部年级</option>
-          <option>小学</option>
-          <option>初中</option>
-          <option>高中</option>
-          <option>大学</option>
-          <option>成人</option>
+          <option>小学</option><option>初中</option><option>高中</option><option>大学</option><option>成人</option>
         </select>
       </div>
 
@@ -413,47 +573,51 @@
           <label><input type="checkbox" class="filter-mode" value="线下" checked> 线下机构</label>
         </div>
       </div>
+
+      <button class="btn btn-primary" id="sidebarCloseBtn" style="width:100%;margin-top:8px;display:none" aria-label="关闭筛选">关闭筛选</button>
     </aside>
 
-    <!-- ===== MAIN CONTENT ===== -->
-    <main class="main-content">
+    <!-- ============ MAIN CONTENT ============ -->
+    <main class="main-content" role="main" aria-label="信息列表">
       <div class="search-bar">
-        <input type="text" id="searchInput" placeholder="搜索科目、地区、姓名...">
-        <button id="searchBtn">搜索</button>
+        <input type="search" id="searchInput" placeholder="搜索科目、地区、姓名..." aria-label="搜索">
+        <button class="btn btn-primary" id="searchBtn" aria-label="执行搜索">搜索</button>
       </div>
 
-      <div class="tabs">
-        <button class="tab-btn active" data-tab="all">全部</button>
-        <button class="tab-btn" data-tab="teacher">家教老师</button>
-        <button class="tab-btn" data-tab="student">学生/家长</button>
+      <div class="tabs" role="tablist" aria-label="信息类型切换">
+        <button class="tab-btn active" role="tab" aria-selected="true" data-tab="all">全部</button>
+        <button class="tab-btn" role="tab" aria-selected="false" data-tab="teacher">家教老师</button>
+        <button class="tab-btn" role="tab" aria-selected="false" data-tab="student">学生/家长</button>
       </div>
 
-      <div class="sort-row">
+      <div class="toolbar">
         <span>排序：</span>
-        <select id="sortSelect">
+        <select id="sortSelect" aria-label="排序方式">
           <option value="time">最新发布</option>
           <option value="price_asc">价格从低到高</option>
           <option value="price_desc">价格从高到低</option>
         </select>
-        <span style="margin-left: auto;" id="countLabel"></span>
+        <div class="loading-indicator" id="loadingSpinner" aria-hidden="true"></div>
+        <span class="count" id="countLabel"></span>
       </div>
 
-      <div class="card-list" id="cardList"></div>
+      <div class="card-list" id="cardList" aria-live="polite"></div>
     </main>
 
   </div>
 </div>
 
-<!-- ===== MODAL ===== -->
-<div class="overlay" id="overlay">
-  <div class="modal" id="modal">
+<!-- ============ BACK TO TOP ============ -->
+<button class="back-to-top" id="backToTop" aria-label="回到顶部" title="回到顶部">&#9650;</button>
+
+<!-- ============ PUBLISH MODAL ============ -->
+<div class="overlay" id="overlay" role="dialog" aria-modal="true" aria-label="发布家教信息">
+  <div class="modal">
     <div class="modal-header">
       <h2>发布家教信息</h2>
-      <button class="modal-close">&#10005;</button>
+      <button class="modal-close" aria-label="关闭发布弹窗">&#10005;</button>
     </div>
-
-    <form id="postForm">
-
+    <form id="postForm" novalidate>
       <div class="form-group">
         <label>我是<span class="req">*</span></label>
         <div class="role-toggle">
@@ -461,90 +625,38 @@
           <button type="button" class="role-btn" id="roleStudent">&#128218; 学生/家长 (招聘)</button>
         </div>
       </div>
-
       <div class="form-row">
-        <div class="form-group">
-          <label>姓名<span class="req">*</span></label>
-          <input type="text" id="f_name" placeholder="请输入姓名" required>
-        </div>
-        <div class="form-group" id="grp_gender">
-          <label>性别</label>
-          <select id="f_gender">
-            <option value="">不透露</option>
-            <option>男</option>
-            <option>女</option>
-          </select>
-        </div>
+        <div class="form-group"><label>姓名<span class="req">*</span></label><input type="text" id="f_name" placeholder="请输入姓名" required></div>
+        <div class="form-group"><label>性别</label><select id="f_gender"><option value="">不透露</option><option>男</option><option>女</option></select></div>
       </div>
-
       <div class="form-group">
         <label>授课科目<span class="req">*</span></label>
         <div class="subjects-grid" id="subjectChips">
-          <div class="subject-chip">语文</div>
-          <div class="subject-chip">数学</div>
-          <div class="subject-chip">英语</div>
-          <div class="subject-chip">物理</div>
-          <div class="subject-chip">化学</div>
-          <div class="subject-chip">生物</div>
-          <div class="subject-chip">历史</div>
-          <div class="subject-chip">地理</div>
-          <div class="subject-chip">政治</div>
-          <div class="subject-chip">编程</div>
-          <div class="subject-chip">音乐</div>
-          <div class="subject-chip">美术</div>
+          <div class="subject-chip" tabindex="0" role="checkbox" aria-checked="false">语文</div>
+          <div class="subject-chip" tabindex="0" role="checkbox" aria-checked="false">数学</div>
+          <div class="subject-chip" tabindex="0" role="checkbox" aria-checked="false">英语</div>
+          <div class="subject-chip" tabindex="0" role="checkbox" aria-checked="false">物理</div>
+          <div class="subject-chip" tabindex="0" role="checkbox" aria-checked="false">化学</div>
+          <div class="subject-chip" tabindex="0" role="checkbox" aria-checked="false">生物</div>
+          <div class="subject-chip" tabindex="0" role="checkbox" aria-checked="false">历史</div>
+          <div class="subject-chip" tabindex="0" role="checkbox" aria-checked="false">地理</div>
+          <div class="subject-chip" tabindex="0" role="checkbox" aria-checked="false">政治</div>
+          <div class="subject-chip" tabindex="0" role="checkbox" aria-checked="false">编程</div>
+          <div class="subject-chip" tabindex="0" role="checkbox" aria-checked="false">音乐</div>
+          <div class="subject-chip" tabindex="0" role="checkbox" aria-checked="false">美术</div>
         </div>
       </div>
-
       <div class="form-row">
-        <div class="form-group">
-          <label id="gradeLabel">学生年级<span class="req">*</span></label>
-          <select id="f_grade" required>
-            <option value="">请选择</option>
-            <option>小学</option>
-            <option>初中</option>
-            <option>高中</option>
-            <option>大学</option>
-            <option>成人</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>授课方式<span class="req">*</span></label>
-          <select id="f_mode" required>
-            <option value="">请选择</option>
-            <option>上门授课</option>
-            <option>线上授课</option>
-            <option>线下机构</option>
-            <option>均可</option>
-          </select>
-        </div>
+        <div class="form-group"><label id="gradeLabel">学生年级<span class="req">*</span></label><select id="f_grade" required><option value="">请选择</option><option>小学</option><option>初中</option><option>高中</option><option>大学</option><option>成人</option></select></div>
+        <div class="form-group"><label>授课方式<span class="req">*</span></label><select id="f_mode" required><option value="">请选择</option><option>上门授课</option><option>线上授课</option><option>线下机构</option><option>均可</option></select></div>
       </div>
-
       <div class="form-row">
-        <div class="form-group">
-          <label>地区<span class="req">*</span></label>
-          <input type="text" id="f_location" placeholder="如：北京市朝阳区" required>
-        </div>
-        <div class="form-group">
-          <label id="priceLabel">期望薪资 (元/小时)<span class="req">*</span></label>
-          <input type="number" id="f_price" placeholder="如：150" min="0" required>
-        </div>
+        <div class="form-group"><label>地区<span class="req">*</span></label><input type="text" id="f_location" placeholder="如：北京市朝阳区" required></div>
+        <div class="form-group"><label id="priceLabel">期望薪资 (元/小时)<span class="req">*</span></label><input type="number" id="f_price" placeholder="如：150" min="0" required></div>
       </div>
-
-      <div class="form-group" id="grp_edu">
-        <label>学历 / 院校</label>
-        <input type="text" id="f_edu" placeholder="如：北京大学 本科">
-      </div>
-
-      <div class="form-group">
-        <label>联系方式<span class="req">*</span></label>
-        <input type="text" id="f_contact" placeholder="手机号 / 微信号" required>
-      </div>
-
-      <div class="form-group">
-        <label>详细介绍</label>
-        <textarea id="f_desc" placeholder="请简要介绍自己的教学经历、特点，或招聘需求..."></textarea>
-      </div>
-
+      <div class="form-group" id="grp_edu"><label>学历 / 院校</label><input type="text" id="f_edu" placeholder="如：北京大学 本科"></div>
+      <div class="form-group"><label>联系方式<span class="req">*</span></label><input type="text" id="f_contact" placeholder="手机号 / 微信号" required></div>
+      <div class="form-group"><label>详细介绍</label><textarea id="f_desc" placeholder="请简要介绍自己的教学经历、特点，或招聘需求..."></textarea></div>
       <div class="form-footer">
         <button type="button" class="btn-cancel">取消</button>
         <button type="submit" class="btn-submit">发布</button>
@@ -553,18 +665,11 @@
   </div>
 </div>
 
-<div class="toast" id="toast"></div>
-
-<!-- ===== 管理密码弹窗 ===== -->
-<div class="overlay" id="adminOverlay">
+<!-- ============ ADMIN PASSWORD MODAL ============ -->
+<div class="overlay" id="adminOverlay" role="dialog" aria-modal="true" aria-label="管理员验证">
   <div class="modal" style="max-width:380px">
-    <div class="modal-header">
-      <h2>管理员验证</h2>
-    </div>
-    <div class="form-group">
-      <label>请输入管理密码</label>
-      <input type="password" id="adminPassword" placeholder="输入密码">
-    </div>
+    <div class="modal-header"><h2>管理员验证</h2></div>
+    <div class="form-group"><label>请输入管理密码</label><input type="password" id="adminPassword" placeholder="输入密码" aria-label="管理密码"></div>
     <div class="form-footer">
       <button type="button" class="btn-cancel" id="adminCancel">取消</button>
       <button type="button" class="btn-submit" id="adminConfirm">确认</button>
@@ -572,14 +677,11 @@
   </div>
 </div>
 
-<!-- ===== 编辑弹窗（复用结构）===== -->
-<div class="overlay" id="editOverlay">
+<!-- ============ EDIT MODAL ============ -->
+<div class="overlay" id="editOverlay" role="dialog" aria-modal="true" aria-label="编辑信息">
   <div class="modal" style="max-width:560px">
-    <div class="modal-header">
-      <h2 id="editTitle">编辑信息</h2>
-      <button class="modal-close" id="editCloseBtn">&#10005;</button>
-    </div>
-    <form id="editForm">
+    <div class="modal-header"><h2>编辑信息</h2><button class="modal-close" id="editCloseBtn" aria-label="关闭编辑弹窗">&#10005;</button></div>
+    <form id="editForm" novalidate>
       <div class="form-group">
         <label>我是</label>
         <div class="role-toggle">
@@ -588,68 +690,31 @@
         </div>
       </div>
       <div class="form-row">
-        <div class="form-group">
-          <label>姓名<span class="req">*</span></label>
-          <input type="text" id="edit_name" required>
-        </div>
-        <div class="form-group">
-          <label>性别</label>
-          <select id="edit_gender">
-            <option value="">不透露</option>
-            <option>男</option>
-            <option>女</option>
-          </select>
-        </div>
+        <div class="form-group"><label>姓名<span class="req">*</span></label><input type="text" id="edit_name" required></div>
+        <div class="form-group"><label>性别</label><select id="edit_gender"><option value="">不透露</option><option>男</option><option>女</option></select></div>
       </div>
       <div class="form-group">
         <label>授课科目<span class="req">*</span></label>
         <div class="subjects-grid" id="editSubjectChips">
-          <div class="subject-chip">语文</div><div class="subject-chip">数学</div>
-          <div class="subject-chip">英语</div><div class="subject-chip">物理</div>
-          <div class="subject-chip">化学</div><div class="subject-chip">生物</div>
-          <div class="subject-chip">历史</div><div class="subject-chip">地理</div>
-          <div class="subject-chip">政治</div><div class="subject-chip">编程</div>
-          <div class="subject-chip">音乐</div><div class="subject-chip">美术</div>
+          <div class="subject-chip" tabindex="0" role="checkbox" aria-checked="false">语文</div><div class="subject-chip" tabindex="0" role="checkbox" aria-checked="false">数学</div>
+          <div class="subject-chip" tabindex="0" role="checkbox" aria-checked="false">英语</div><div class="subject-chip" tabindex="0" role="checkbox" aria-checked="false">物理</div>
+          <div class="subject-chip" tabindex="0" role="checkbox" aria-checked="false">化学</div><div class="subject-chip" tabindex="0" role="checkbox" aria-checked="false">生物</div>
+          <div class="subject-chip" tabindex="0" role="checkbox" aria-checked="false">历史</div><div class="subject-chip" tabindex="0" role="checkbox" aria-checked="false">地理</div>
+          <div class="subject-chip" tabindex="0" role="checkbox" aria-checked="false">政治</div><div class="subject-chip" tabindex="0" role="checkbox" aria-checked="false">编程</div>
+          <div class="subject-chip" tabindex="0" role="checkbox" aria-checked="false">音乐</div><div class="subject-chip" tabindex="0" role="checkbox" aria-checked="false">美术</div>
         </div>
       </div>
       <div class="form-row">
-        <div class="form-group">
-          <label id="editGradeLabel">学生年级<span class="req">*</span></label>
-          <select id="edit_grade" required>
-            <option value="">请选择</option>
-            <option>小学</option><option>初中</option><option>高中</option><option>大学</option><option>成人</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>授课方式<span class="req">*</span></label>
-          <select id="edit_mode" required>
-            <option value="">请选择</option>
-            <option>上门授课</option><option>线上授课</option><option>线下机构</option><option>均可</option>
-          </select>
-        </div>
+        <div class="form-group"><label id="editGradeLabel">学生年级<span class="req">*</span></label><select id="edit_grade" required><option value="">请选择</option><option>小学</option><option>初中</option><option>高中</option><option>大学</option><option>成人</option></select></div>
+        <div class="form-group"><label>授课方式<span class="req">*</span></label><select id="edit_mode" required><option value="">请选择</option><option>上门授课</option><option>线上授课</option><option>线下机构</option><option>均可</option></select></div>
       </div>
       <div class="form-row">
-        <div class="form-group">
-          <label>地区<span class="req">*</span></label>
-          <input type="text" id="edit_location" required>
-        </div>
-        <div class="form-group">
-          <label id="editPriceLabel">期望薪资 (元/小时)<span class="req">*</span></label>
-          <input type="number" id="edit_price" min="0" required>
-        </div>
+        <div class="form-group"><label>地区<span class="req">*</span></label><input type="text" id="edit_location" required></div>
+        <div class="form-group"><label id="editPriceLabel">期望薪资 (元/小时)<span class="req">*</span></label><input type="number" id="edit_price" min="0" required></div>
       </div>
-      <div class="form-group" id="edit_grp_edu">
-        <label>学历 / 院校</label>
-        <input type="text" id="edit_edu">
-      </div>
-      <div class="form-group">
-        <label>联系方式<span class="req">*</span></label>
-        <input type="text" id="edit_contact" required>
-      </div>
-      <div class="form-group">
-        <label>详细介绍</label>
-        <textarea id="edit_desc"></textarea>
-      </div>
+      <div class="form-group" id="edit_grp_edu"><label>学历 / 院校</label><input type="text" id="edit_edu"></div>
+      <div class="form-group"><label>联系方式<span class="req">*</span></label><input type="text" id="edit_contact" required></div>
+      <div class="form-group"><label>详细介绍</label><textarea id="edit_desc"></textarea></div>
       <div class="form-footer">
         <button type="button" class="btn-cancel" id="editCancel">取消</button>
         <button type="submit" class="btn-submit">保存修改</button>
@@ -658,154 +723,28 @@
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<!-- ============ TOAST ============ -->
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<!-- ============ SCRIPTS ============ -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js" defer></script>
 <script>
 (function() {
 'use strict';
 
-// ========== 内置错误显示 ==========
-function showPageError(msg) {
-  var banner = document.getElementById('pageError');
-  if (!banner) {
-    banner = document.createElement('div');
-    banner.id = 'pageError';
-    banner.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:9999;padding:14px 20px;background:#E24B4A;color:#fff;font-size:14px;text-align:center;font-weight:500;';
-    document.body.insertBefore(banner, document.body.firstChild);
-  }
-  banner.textContent = '⚠ ' + msg;
-}
+/* ================================================================
+   SUPABASE CONFIG
+   ================================================================ */
+const SUPABASE_URL = 'https://pjwnpdgoffsolauxhcju.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBqd25wZGdvZmZzb2xhdXhoY2p1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODExMzMyOTQsImV4cCI6MjA5NjcwOTI5NH0.HbLsVEwYZ3mmuBtj1z1o2gKxytMKfn7qJuaawZVhV2c';
 
-// ========== SUPABASE 配置 ==========
-var SUPABASE_URL = 'https://pjwnpdgoffsolauxhcju.supabase.co';
-var SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBqd25wZGdvZmZzb2xhdXhoY2p1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODExMzMyOTQsImV4cCI6MjA5NjcwOTI5NH0.HbLsVEwYZ3mmuBtj1z1o2gKxytMKfn7qJuaawZVhV2c';
+let supabase;
 
-var supabase;
-try {
-  if (typeof window.supabase === 'undefined') {
-    showPageError('Supabase SDK 加载失败，请检查网络');
-  } else {
-    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-  }
-} catch(e) {
-  showPageError('初始化失败: ' + e.message);
-}
-
-var currentRole = 'teacher';
-var currentTab = 'all';
-var cachedData = [];
-
-// ========== 数据读取 ==========
-async function fetchData() {
-  if (!supabase) return [];
-  try {
-    var result = await supabase.from('tutors').select('*').order('created_at', { ascending: false });
-    if (result.error) { console.error('读取失败:', result.error); return []; }
-    return (result.data || []).map(function(row) { return {
-      id: row.id, role: row.role, name: row.name, gender: row.gender || '',
-      subjects: row.subjects || [], grade: row.grade, mode: row.mode,
-      location: row.location, price: row.price, edu: row.edu || '',
-      contact: row.contact, desc: row.description || '',
-      time: new Date(row.created_at).getTime(), urgent: row.urgent || false
-    };});
-  } catch(e) {
-    showPageError('数据加载失败: ' + e.message);
-    return [];
-  }
-}
-
-// ========== FILTERS ==========
-function getFilters() {
-  var types = [].slice.call(document.querySelectorAll('.filter-type:checked')).map(function(el){return el.value;});
-  var subjects = [].slice.call(document.querySelectorAll('.filter-subject:checked')).map(function(el){return el.value;});
-  var modes = [].slice.call(document.querySelectorAll('.filter-mode:checked')).map(function(el){return el.value;});
-  var grade = document.getElementById('gradeFilter').value;
-  var q = document.getElementById('searchInput').value.trim().toLowerCase();
-  var sort = document.getElementById('sortSelect').value;
-  return { types: types, subjects: subjects, modes: modes, grade: grade, q: q, sort: sort };
-}
-
-function switchTab(btn) {
-  document.querySelectorAll('.tab-btn').forEach(function(b){ b.classList.remove('active'); });
-  btn.classList.add('active');
-  currentTab = btn.dataset.tab;
-  renderCards();
-}
-
-async function renderCards() {
-  if (!supabase) {
-    document.getElementById('cardList').innerHTML = '<div class="empty"><div class="empty-icon">&#9888;</div><p>数据库未连接，请检查网络后刷新</p></div>';
-    return;
-  }
-  cachedData = await fetchData();
-  var f = getFilters();
-  var list = cachedData.filter(function(item) {
-    if (currentTab !== 'all' && item.role !== currentTab) return false;
-    if (!f.types.includes(item.role)) return false;
-    if (f.grade && item.grade !== f.grade) return false;
-    var modeMatch = f.modes.some(function(m){ return item.mode.includes(m) || item.mode === '均可'; });
-    if (!modeMatch) return false;
-    if (f.subjects.length > 0) {
-      var subjectMatch = item.subjects.some(function(s){ return f.subjects.includes(s); });
-      if (!subjectMatch) return false;
-    }
-    if (f.q) {
-      var text = [item.name, item.subjects.join(' '), item.location, item.desc, item.edu].join(' ').toLowerCase();
-      if (!text.includes(f.q)) return false;
-    }
-    return true;
-  });
-
-  if (f.sort === 'time') list.sort(function(a,b){ return b.time - a.time; });
-  else if (f.sort === 'price_asc') list.sort(function(a,b){ return a.price - b.price; });
-  else if (f.sort === 'price_desc') list.sort(function(a,b){ return b.price - a.price; });
-
-  var container = document.getElementById('cardList');
-  document.getElementById('countLabel').textContent = '共 ' + list.length + ' 条';
-  if (list.length === 0) {
-    container.innerHTML = '<div class="empty"><div class="empty-icon">&#128269;</div><p>暂无符合条件的信息</p></div>';
-    return;
-  }
-  container.innerHTML = list.map(function(item) {
-    return '<div class="card" data-id="' + item.id + '">'
-    + '<div class="card-header">'
-    + '<span class="card-title">' + esc(item.name) + ' · ' + item.subjects.join(' / ') + '</span>'
-    + '<div style="display:flex;gap:6px;flex-shrink:0">'
-    + (item.urgent ? '<span class="tag tag-urgent">急招</span>' : '')
-    + '<span class="tag ' + (item.role === 'teacher' ? 'tag-teacher' : 'tag-student') + '">' + (item.role === 'teacher' ? '老师求职' : '家长招聘') + '</span>'
-    + '</div></div>'
-    + '<div class="card-meta">'
-    + '<span><span class="ico">&#127979;</span>' + item.grade + '</span>'
-    + '<span><span class="ico">&#128205;</span>' + esc(item.location) + '</span>'
-    + '<span><span class="ico">&#128187;</span>' + esc(item.mode) + '</span>'
-    + '<span><span class="ico">&#128178;</span>¥' + item.price + '/小时</span>'
-    + (item.edu ? '<span><span class="ico">&#127891;</span>' + esc(item.edu) + '</span>' : '')
-    + '</div>'
-    + '<div class="card-desc">' + esc(item.desc || '暂无介绍') + '</div>'
-    + '<div class="card-footer">'
-    + '<span class="card-time">' + timeAgo(item.time) + '</span>'
-    + '<button class="contact-btn contact-item-btn" data-id="' + item.id + '">联系TA</button>'
-    + (isAdmin
-      ? '<button class="edit-btn admin-action-btn" data-id="' + item.id + '">编辑</button>'
-      + '<button class="delete-btn admin-action-btn" data-id="' + item.id + '">删除</button>'
-      : '')
-    + '</div></div>';
-  }).join('');
-
-  // === 事件委托：卡片点击 + 联系按钮 ===
-  container.querySelectorAll('.card').forEach(function(card) {
-    card.addEventListener('click', function() { showDetail(parseInt(card.dataset.id)); });
-  });
-  container.querySelectorAll('.contact-item-btn').forEach(function(btn) {
-    btn.addEventListener('click', function(e) { e.stopPropagation(); contactItem(parseInt(btn.dataset.id)); });
-  });
-  // 管理模式：编辑/删除按钮
-  container.querySelectorAll('.edit-btn').forEach(function(btn) {
-    btn.addEventListener('click', function(e) { e.stopPropagation(); editItem(parseInt(btn.dataset.id)); });
-  });
-  container.querySelectorAll('.delete-btn').forEach(function(btn) {
-    btn.addEventListener('click', function(e) { e.stopPropagation(); deleteItem(parseInt(btn.dataset.id)); });
-  });
-}
+/* ================================================================
+   UTILITY FUNCTIONS
+   ================================================================ */
+const $ = (sel, ctx) => (ctx || document).querySelector(sel);
+const $$ = (sel, ctx) => [].slice.call((ctx || document).querySelectorAll(sel));
 
 function esc(s) {
   if (!s) return '';
@@ -813,63 +752,317 @@ function esc(s) {
 }
 
 function timeAgo(ts) {
-  var s = Math.floor((Date.now() - ts) / 1000);
+  const s = Math.floor((Date.now() - ts) / 1000);
   if (s < 60) return '刚刚';
-  if (s < 3600) return Math.floor(s/60) + ' 分钟前';
-  if (s < 86400) return Math.floor(s/3600) + ' 小时前';
-  return Math.floor(s/86400) + ' 天前';
+  if (s < 3600) return Math.floor(s / 60) + ' 分钟前';
+  if (s < 86400) return Math.floor(s / 3600) + ' 小时前';
+  const d = Math.floor(s / 86400);
+  if (d < 30) return d + ' 天前';
+  if (d < 365) return Math.floor(d / 30) + ' 个月前';
+  return Math.floor(d / 365) + ' 年前';
 }
 
-function contactItem(id) {
-  var item = cachedData.find(function(d){ return d.id === id; });
-  if (item) showToast('联系方式：' + item.contact);
+function showToast(msg, isError) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast' + (isError ? ' error' : '');
+  t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.classList.remove('show'), 2800);
 }
 
-function showDetail(id) {
-  var item = cachedData.find(function(d){ return d.id === id; });
+function showError(msg) {
+  const existing = document.getElementById('pageError');
+  if (existing) existing.textContent = '\u26A0 ' + msg;
+  else {
+    const b = document.createElement('div');
+    b.id = 'pageError';
+    b.className = 'error-banner';
+    b.textContent = '\u26A0 ' + msg;
+    document.body.insertBefore(b, document.body.firstChild);
+  }
+  showToast(msg, true);
+}
+
+// Debounce utility
+function debounce(fn, ms) {
+  let timer;
+  return function(...args) {
+    clearTimeout(timer);
+    timer = setTimeout(() => fn.apply(this, args), ms);
+  };
+}
+
+/* ================================================================
+   CACHE LAYER (5-min TTL, request deduplication)
+   ================================================================ */
+const cache = {
+  data: null,
+  timestamp: 0,
+  ttl: 5 * 60 * 1000,
+  pending: null,
+
+  async get() {
+    // Return cached data if valid
+    if (this.data && Array.isArray(this.data) && Date.now() - this.timestamp < this.ttl) {
+      return this.data;
+    }
+
+    // Deduplicate concurrent requests
+    if (this.pending) return this.pending;
+
+    this.pending = this._fetch();
+    try {
+      const result = await this.pending;
+      if (Array.isArray(result)) {
+        this.data = result;
+        this.timestamp = Date.now();
+      }
+      return result;
+    } finally {
+      this.pending = null;
+    }
+  },
+
+  async _fetch() {
+    if (!supabase) return [];
+    try {
+      const result = await supabase.from('tutors').select('*').order('created_at', { ascending: false });
+      if (result.error) {
+        console.error('Supabase fetch error:', result.error);
+        // Return stale cache if available
+        return Array.isArray(this.data) ? this.data : [];
+      }
+      return (result.data || []).map(function(row) {
+        return {
+          id: row.id, role: row.role, name: row.name, gender: row.gender || '',
+          subjects: row.subjects || [], grade: row.grade, mode: row.mode,
+          location: row.location, price: row.price, edu: row.edu || '',
+          contact: row.contact, desc: row.description || '',
+          time: new Date(row.created_at).getTime(), urgent: row.urgent || false
+        };
+      });
+    } catch(e) {
+      console.error('Supabase fetch exception:', e);
+      return Array.isArray(this.data) ? this.data : [];
+    }
+  },
+
+  invalidate() { this.data = null; this.timestamp = 0; }
+};
+
+/* ================================================================
+   STATE
+   ================================================================ */
+let currentRole = 'teacher';
+let currentTab = 'all';
+let isAdmin = false;
+let editingId = null;
+let isLoading = false;
+
+/* ================================================================
+   FILTERS
+   ================================================================ */
+function getFilters() {
+  return {
+    types: $$('.filter-type:checked').map(el => el.value),
+    subjects: $$('.filter-subject:checked').map(el => el.value),
+    modes: $$('.filter-mode:checked').map(el => el.value),
+    grade: document.getElementById('gradeFilter').value,
+    q: document.getElementById('searchInput').value.trim().toLowerCase(),
+    sort: document.getElementById('sortSelect').value
+  };
+}
+
+function filterData(list, f) {
+  return list.filter(item => {
+    if (currentTab !== 'all' && item.role !== currentTab) return false;
+    if (!f.types.includes(item.role)) return false;
+    if (f.grade && item.grade !== f.grade) return false;
+    if (f.modes.length > 0) {
+      const match = f.modes.some(m => item.mode.includes(m) || item.mode === '均可');
+      if (!match) return false;
+    }
+    if (f.subjects.length > 0) {
+      if (!item.subjects.some(s => f.subjects.includes(s))) return false;
+    }
+    if (f.q) {
+      const txt = [item.name, ...item.subjects, item.location, item.desc, item.edu].join(' ').toLowerCase();
+      if (!txt.includes(f.q)) return false;
+    }
+    return true;
+  });
+}
+
+function sortData(list, sort) {
+  if (sort === 'time') return list.sort((a, b) => b.time - a.time);
+  if (sort === 'price_asc') return list.sort((a, b) => a.price - b.price);
+  if (sort === 'price_desc') return list.sort((a, b) => b.price - a.price);
+  return list;
+}
+
+/* ================================================================
+   RENDER
+   ================================================================ */
+function showSkeletons() {
+  const container = document.getElementById('cardList');
+  container.innerHTML = [1, 2, 3].map(() =>
+    '<div class="sk-card"><div class="skeleton sk-title"></div><div class="skeleton sk-row"></div><div class="skeleton sk-desc"></div></div>'
+  ).join('');
+}
+
+function renderCard(item) {
+  return '<div class="card" data-id="' + item.id + '" tabindex="0" role="article" aria-label="' +
+    esc(item.name) + ' - ' + item.subjects.join(' / ') + '">' +
+    '<div class="card-header">' +
+    '<span class="card-title">' + esc(item.name) + ' &middot; ' + item.subjects.join(' / ') + '</span>' +
+    '<div style="display:flex;gap:6px;flex-shrink:0">' +
+    (item.urgent ? '<span class="tag tag-urgent">急招</span>' : '') +
+    '<span class="tag ' + (item.role === 'teacher' ? 'tag-teacher' : 'tag-student') + '">' +
+    (item.role === 'teacher' ? '老师求职' : '家长招聘') + '</span>' +
+    '</div></div>' +
+    '<div class="card-meta">' +
+    '<span><span class="ico">&#127979;</span>' + item.grade + '</span>' +
+    '<span><span class="ico">&#128205;</span>' + esc(item.location) + '</span>' +
+    '<span><span class="ico">&#128187;</span>' + esc(item.mode) + '</span>' +
+    '<span><span class="ico">&#128178;</span>&yen;' + item.price + '/小时</span>' +
+    (item.edu ? '<span><span class="ico">&#127891;</span>' + esc(item.edu) + '</span>' : '') +
+    '</div>' +
+    '<div class="card-desc">' + esc(item.desc || '暂无介绍') + '</div>' +
+    '<div class="card-footer">' +
+    '<span class="card-time">' + timeAgo(item.time) + '</span>' +
+    '<div class="card-actions">' +
+    '<button class="btn-sm btn-contact contact-btn" data-id="' + item.id + '">查看联系方式</button>' +
+    (isAdmin
+      ? '<button class="btn-sm btn-edit edit-btn" data-id="' + item.id + '" aria-label="编辑">编辑</button>' +
+        '<button class="btn-sm btn-delete delete-btn" data-id="' + item.id + '" aria-label="删除">删除</button>'
+      : '') +
+    '</div></div></div>';
+}
+
+async function renderCards(skipSkeleton) {
+  const container = document.getElementById('cardList');
+  if (!container) return;
+  const spinner = document.getElementById('loadingSpinner');
+
+  if (!skipSkeleton) {
+    isLoading = true;
+    if (spinner) spinner.classList.add('show');
+    showSkeletons();
+  }
+
+  try {
+    const data = await cache.get();
+    if (!Array.isArray(data)) {
+      container.innerHTML = '<div class="empty"><span class="empty-icon">&#9888;</span><p>数据加载失败，请刷新页面重试</p></div>';
+      return;
+    }
+
+    const f = getFilters();
+    const filtered = filterData(data, f);
+    const list = sortData(filtered, f.sort);
+
+    const countLabel = document.getElementById('countLabel');
+    if (countLabel) countLabel.textContent = '共 ' + list.length + ' 条';
+
+    const statTotal = document.getElementById('statTotal');
+    const statTeacher = document.getElementById('statTeacher');
+    const statStudent = document.getElementById('statStudent');
+    if (statTotal) statTotal.textContent = data.length;
+    if (statTeacher) statTeacher.textContent = data.filter(d => d.role === 'teacher').length;
+    if (statStudent) statStudent.textContent = data.filter(d => d.role === 'student').length;
+
+    if (list.length === 0) {
+      container.innerHTML = '<div class="empty"><span class="empty-icon">&#128269;</span><p>暂无符合条件的信息</p></div>';
+    } else {
+      container.innerHTML = list.map(renderCard).join('');
+    }
+  } catch (e) {
+    console.error('renderCards error:', e);
+    container.innerHTML = '<div class="empty"><span class="empty-icon">&#9888;</span><p>加载失败：' + esc(String(e.message || e)) + '</p></div>';
+  } finally {
+    isLoading = false;
+    if (spinner) spinner.classList.remove('show');
+    bindCardEvents();
+  }
+}
+
+// Debounced render for search input
+const debouncedRender = debounce(() => renderCards(true), 300);
+
+/* ================================================================
+   EVENTS
+   ================================================================ */
+function bindCardEvents() {
+  const container = document.getElementById('cardList');
+
+  $$('.card', container).forEach(card => {
+    card.addEventListener('click', function() { showContact(parseInt(this.dataset.id)); });
+    card.addEventListener('keydown', function(e) { if (e.key === 'Enter') showContact(parseInt(this.dataset.id)); });
+  });
+
+  $$('.contact-btn', container).forEach(btn => {
+    btn.addEventListener('click', function(e) { e.stopPropagation(); showContact(parseInt(this.dataset.id)); });
+  });
+
+  $$('.edit-btn', container).forEach(btn => {
+    btn.addEventListener('click', function(e) { e.stopPropagation(); editItem(parseInt(this.dataset.id)); });
+  });
+
+  $$('.delete-btn', container).forEach(btn => {
+    btn.addEventListener('click', function(e) { e.stopPropagation(); deleteItem(parseInt(this.dataset.id)); });
+  });
+}
+
+function showContact(id) {
+  const item = cache.data && cache.data.find(d => d.id === id);
   if (!item) return;
+  // Click to reveal — security improvement
   showToast('联系方式：' + item.contact);
 }
 
-// ========== MODAL（全部改用 addEventListener）==========
-var overlay = document.getElementById('overlay');
+/* ================================================================
+   MODAL: PUBLISH
+   ================================================================ */
+const overlay = document.getElementById('overlay');
 
 function openModal() {
-  overlay.classList.add('show');
+  var ov = document.getElementById('overlay');
+  if (!ov) return;
+  ov.classList.add('show');
   document.getElementById('postForm').reset();
-  document.querySelectorAll('.subject-chip').forEach(function(c){ c.classList.remove('selected'); });
+  $$('.subject-chip').forEach(function(c) { c.classList.remove('selected'); c.setAttribute('aria-checked', 'false'); });
   setRole('teacher');
+  var nameInput = document.getElementById('f_name');
+  if (nameInput) nameInput.focus();
 }
 
 function closeModal() {
-  overlay.classList.remove('show');
+  var ov = document.getElementById('overlay');
+  if (ov) ov.classList.remove('show');
 }
 
 function setRole(role) {
   currentRole = role;
-  document.getElementById('roleTeacher').className = 'role-btn' + (role === 'teacher' ? ' active-teacher' : '');
-  document.getElementById('roleStudent').className = 'role-btn' + (role === 'student' ? ' active-student' : '');
+  const tBtn = document.getElementById('roleTeacher');
+  const sBtn = document.getElementById('roleStudent');
+  tBtn.className = 'role-btn' + (role === 'teacher' ? ' active-teacher' : '');
+  sBtn.className = 'role-btn' + (role === 'student' ? ' active-student' : '');
   document.getElementById('gradeLabel').textContent = role === 'teacher' ? '擅长年级' : '学生年级';
   document.getElementById('priceLabel').textContent = role === 'teacher' ? '期望薪资 (元/小时)' : '预算 (元/小时)';
   document.getElementById('grp_edu').style.display = role === 'teacher' ? '' : 'none';
 }
 
-function toggleChip(el) {
-  el.classList.toggle('selected');
-}
-
 async function handleFormSubmit(e) {
   e.preventDefault();
-  var chips = [].slice.call(document.querySelectorAll('.subject-chip.selected')).map(function(c){ return c.textContent; });
-  if (chips.length === 0) { showToast('请至少选择一个科目'); return; }
-  if (!supabase) { showToast('数据库未连接，请刷新页面重试'); return; }
+  const chips = $$('.subject-chip.selected').map(c => c.textContent);
+  if (chips.length === 0) { showToast('请至少选择一个科目', true); return; }
+  if (!supabase) { showToast('数据库未连接，请刷新', true); return; }
 
-  var payload = {
-    role: currentRole,
-    name: document.getElementById('f_name').value.trim(),
+  const payload = {
+    role: currentRole, name: document.getElementById('f_name').value.trim(),
     gender: document.getElementById('f_gender').value,
-    subjects: chips,
-    grade: document.getElementById('f_grade').value,
+    subjects: chips, grade: document.getElementById('f_grade').value,
     mode: document.getElementById('f_mode').value,
     location: document.getElementById('f_location').value.trim(),
     price: parseInt(document.getElementById('f_price').value) || 0,
@@ -880,141 +1073,59 @@ async function handleFormSubmit(e) {
   };
 
   try {
-    var result = await supabase.from('tutors').insert(payload);
-    if (result.error) { showToast('发布失败：' + result.error.message); return; }
-  } catch(err) {
-    showToast('发布失败：' + err.message);
-    return;
-  }
+    const result = await supabase.from('tutors').insert(payload);
+    if (result.error) { showToast('发布失败：' + result.error.message, true); return; }
+  } catch(err) { showToast('发布失败：' + err.message, true); return; }
 
-  overlay.classList.remove('show');
-  await renderCards();
-  showToast('发布成功！数据已同步到云端');
+  closeModal();
+  cache.invalidate();
+  await renderCards(true);
+  showToast('\u2705 发布成功！数据已同步到云端');
 }
 
-// ========== TOAST ==========
-function showToast(msg) {
-  var t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(function(){ t.classList.remove('show'); }, 2800);
-}
+/* ================================================================
+   ADMIN
+   ================================================================ */
+const ADMIN_DEFAULT_PWD = 'admin123';
 
-// ========== 统一事件绑定（不再依赖 inline onclick）==========
-function bindAll() {
-  // 发布按钮
-  var postBtn = document.querySelector('.post-btn');
-  if (postBtn) postBtn.addEventListener('click', openModal);
+function getAdminPassword() { return localStorage.getItem('tutor_admin_pwd') || ADMIN_DEFAULT_PWD; }
+function setAdminPassword(pwd) { localStorage.setItem('tutor_admin_pwd', pwd); }
 
-  // 弹窗关闭按钮 + 点击遮罩关闭
-  var closeBtn = document.querySelector('.modal-close');
-  if (closeBtn) closeBtn.addEventListener('click', closeModal);
-  overlay.addEventListener('click', function(e) { if (e.target === overlay) closeModal(); });
-
-  // 角色切换
-  var roleT = document.getElementById('roleTeacher');
-  var roleS = document.getElementById('roleStudent');
-  if (roleT) roleT.addEventListener('click', function(){ setRole('teacher'); });
-  if (roleS) roleS.addEventListener('click', function(){ setRole('student'); });
-
-  // 科目选择
-  document.querySelectorAll('.subject-chip').forEach(function(c){
-    c.addEventListener('click', function(){ toggleChip(c); });
-  });
-
-  // 表单提交
-  var form = document.getElementById('postForm');
-  if (form) form.addEventListener('submit', handleFormSubmit);
-
-  // 取消按钮
-  var cancelBtn = document.querySelector('.btn-cancel');
-  if (cancelBtn) cancelBtn.addEventListener('click', closeModal);
-
-  // Tab 切换
-  document.querySelectorAll('.tab-btn').forEach(function(btn){
-    btn.addEventListener('click', function(){ switchTab(btn); });
-  });
-
-  // 筛选
-  document.querySelectorAll('.filter-type, .filter-subject, .filter-mode').forEach(function(el){
-    el.addEventListener('change', renderCards);
-  });
-
-  // 排序
-  var sortSel = document.getElementById('sortSelect');
-  if (sortSel) sortSel.addEventListener('change', renderCards);
-
-  // 搜索
-  var searchInput = document.getElementById('searchInput');
-  if (searchInput) searchInput.addEventListener('input', function() { renderCards(); });
-  var searchBtn = document.getElementById('searchBtn');
-  if (searchBtn) searchBtn.addEventListener('click', renderCards);
-
-  // 年级筛选
-  var gradeFilter = document.getElementById('gradeFilter');
-  if (gradeFilter) gradeFilter.addEventListener('change', renderCards);
-}
-
-// ========== 管理功能 ==========
-var isAdmin = false;
-var ADMIN_DEFAULT_PWD = 'admin123';
-var editingId = null;
-
-// 管理员密码（首次使用默认密码，之后可在管理模式下修改）
-function getAdminPassword() {
-  return localStorage.getItem('tutor_admin_pwd') || ADMIN_DEFAULT_PWD;
-}
-function setAdminPassword(pwd) {
-  localStorage.setItem('tutor_admin_pwd', pwd);
-}
-
-// 打开管理密码弹窗
-function showAdminLogin() {
-  document.getElementById('adminPassword').value = '';
-  document.getElementById('adminOverlay').classList.add('show');
-  setTimeout(function(){ document.getElementById('adminPassword').focus(); }, 100);
-}
-function hideAdminLogin() {
-  document.getElementById('adminOverlay').classList.remove('show');
-}
-
-// 进入管理模式
 function enterAdminMode() {
   isAdmin = true;
-  document.getElementById('adminToggle').classList.add('active');
-  document.getElementById('adminToggle').textContent = '\u2699 退出管理';
-  renderCards();
-  showToast('已进入管理模式，可编辑和删除信息');
+  const btn = document.getElementById('adminToggle');
+  btn.classList.add('active');
+  btn.innerHTML = '&#9881; 退出';
+  renderCards(true);
+  showToast('已进入管理模式');
 }
 
 function exitAdminMode() {
-  isAdmin = false;
-  editingId = null;
-  document.getElementById('adminToggle').classList.remove('active');
-  document.getElementById('adminToggle').textContent = '\u2699 管理';
+  isAdmin = false; editingId = null;
+  const btn = document.getElementById('adminToggle');
+  btn.classList.remove('active');
+  btn.innerHTML = '&#9881;';
   document.getElementById('editOverlay').classList.remove('show');
-  renderCards();
+  renderCards(true);
   showToast('已退出管理模式');
 }
 
-// 修改管理密码
-function changeAdminPwd() {
-  var newPwd = prompt('请输入新管理密码（最少3位）：');
-  if (!newPwd || newPwd.length < 3) { showToast('密码至少3位，未修改'); return; }
-  setAdminPassword(newPwd);
-  showToast('管理密码已更新！');
+/* ================================================================
+   EDIT & DELETE
+   ================================================================ */
+function setEditRole(role) {
+  document.getElementById('editRoleTeacher').className = 'role-btn' + (role === 'teacher' ? ' active-teacher' : '');
+  document.getElementById('editRoleStudent').className = 'role-btn' + (role === 'student' ? ' active-student' : '');
+  document.getElementById('editGradeLabel').textContent = role === 'teacher' ? '擅长年级' : '学生年级';
+  document.getElementById('editPriceLabel').textContent = role === 'teacher' ? '期望薪资 (元/小时)' : '预算 (元/小时)';
+  document.getElementById('edit_grp_edu').style.display = role === 'teacher' ? '' : 'none';
 }
 
-// 编辑信息
 function editItem(id) {
-  var item = cachedData.find(function(d){ return d.id === id; });
+  const item = cache.data && cache.data.find(d => d.id === id);
   if (!item) return;
   editingId = id;
-
-  // 设置角色
   setEditRole(item.role);
-
-  // 填充字段
   document.getElementById('edit_name').value = item.name || '';
   document.getElementById('edit_gender').value = item.gender || '';
   document.getElementById('edit_grade').value = item.grade || '';
@@ -1024,148 +1135,277 @@ function editItem(id) {
   document.getElementById('edit_edu').value = item.edu || '';
   document.getElementById('edit_contact').value = item.contact || '';
   document.getElementById('edit_desc').value = item.desc || '';
-
-  // 科目 chips
-  document.querySelectorAll('#editSubjectChips .subject-chip').forEach(function(c){
+  $$('#editSubjectChips .subject-chip').forEach(c => {
     c.classList.toggle('selected', item.subjects && item.subjects.includes(c.textContent));
+    c.setAttribute('aria-checked', c.classList.contains('selected').toString());
   });
-
   document.getElementById('editOverlay').classList.add('show');
 }
 
-function setEditRole(role) {
-  document.getElementById('editRoleTeacher').className = 'role-btn' + (role === 'teacher' ? ' active-teacher' : '');
-  document.getElementById('editRoleStudent').className = 'role-btn' + (role === 'student' ? ' active-student' : '');
-  document.getElementById('editGradeLabel').textContent = role === 'teacher' ? '擅长年级' : '学生年级';
-  document.getElementById('editPriceLabel').textContent = role === 'teacher' ? '期望薪资 (元/小时)' : '预算 (元/小时)';
-  document.getElementById('edit_grp_edu').style.display = role === 'teacher' ? '' : 'none';
-}
-
-// 保存编辑
 async function saveEdit(e) {
   e.preventDefault();
-  if (!supabase) { showToast('数据库未连接'); return; }
-  if (!editingId) { showToast('编辑状态异常，请刷新'); return; }
-
-  var chips = [].slice.call(document.querySelectorAll('#editSubjectChips .subject-chip.selected')).map(function(c){ return c.textContent; });
-  if (chips.length === 0) { showToast('请至少选择一个科目'); return; }
-
-  var item = cachedData.find(function(d){ return d.id === editingId; });
-  var role = document.getElementById('editRoleTeacher').classList.contains('active-teacher') ? 'teacher' : 'student';
-
-  var payload = {
-    role: role,
-    name: document.getElementById('edit_name').value.trim(),
-    gender: document.getElementById('edit_gender').value,
-    subjects: chips,
-    grade: document.getElementById('edit_grade').value,
-    mode: document.getElementById('edit_mode').value,
-    location: document.getElementById('edit_location').value.trim(),
-    price: parseInt(document.getElementById('edit_price').value) || 0,
-    edu: document.getElementById('edit_edu').value.trim(),
-    contact: document.getElementById('edit_contact').value.trim(),
-    description: document.getElementById('edit_desc').value.trim()
-  };
+  if (!supabase || !editingId) return;
+  const chips = $$('#editSubjectChips .subject-chip.selected').map(c => c.textContent);
+  if (chips.length === 0) { showToast('请至少选择一个科目', true); return; }
+  const role = document.getElementById('editRoleTeacher').classList.contains('active-teacher') ? 'teacher' : 'student';
 
   try {
-    var result = await supabase.from('tutors').update(payload).eq('id', editingId);
-    if (result.error) { showToast('保存失败：' + result.error.message); return; }
-  } catch(err) {
-    showToast('保存失败：' + err.message);
-    return;
-  }
+    const result = await supabase.from('tutors').update({
+      role, name: document.getElementById('edit_name').value.trim(),
+      gender: document.getElementById('edit_gender').value,
+      subjects: chips, grade: document.getElementById('edit_grade').value,
+      mode: document.getElementById('edit_mode').value,
+      location: document.getElementById('edit_location').value.trim(),
+      price: parseInt(document.getElementById('edit_price').value) || 0,
+      edu: document.getElementById('edit_edu').value.trim(),
+      contact: document.getElementById('edit_contact').value.trim(),
+      description: document.getElementById('edit_desc').value.trim()
+    }).eq('id', editingId);
+    if (result.error) { showToast('保存失败：' + result.error.message, true); return; }
+  } catch(err) { showToast('保存失败：' + err.message, true); return; }
 
   document.getElementById('editOverlay').classList.remove('show');
   editingId = null;
-  await renderCards();
-  showToast('信息已更新！');
+  cache.invalidate();
+  await renderCards(true);
+  showToast('\u2705 信息已更新！');
 }
 
-// 删除信息
 async function deleteItem(id) {
   if (!confirm('确定要删除这条信息吗？此操作不可撤销。')) return;
-  if (!supabase) { showToast('数据库未连接'); return; }
-
+  if (!supabase) { showToast('数据库未连接', true); return; }
   try {
-    var result = await supabase.from('tutors').delete().eq('id', id);
-    if (result.error) { showToast('删除失败：' + result.error.message); return; }
-  } catch(err) {
-    showToast('删除失败：' + err.message);
-    return;
-  }
-
-  await renderCards();
-  showToast('信息已删除');
+    const result = await supabase.from('tutors').delete().eq('id', id);
+    if (result.error) { showToast('删除失败：' + result.error.message, true); return; }
+  } catch(err) { showToast('删除失败：' + err.message, true); return; }
+  cache.invalidate();
+  await renderCards(true);
+  showToast('\u2705 信息已删除');
 }
 
-// ========== INIT ==========
-bindAll();
+/* ================================================================
+   MOBILE SIDEBAR
+   ================================================================ */
+function toggleSidebar() {
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('sidebarOverlay');
+  const hamburger = document.getElementById('hamburger');
+  const isOpen = sidebar.classList.toggle('open');
+  overlay.classList.toggle('open', isOpen);
+  hamburger.classList.toggle('open', isOpen);
+  hamburger.setAttribute('aria-expanded', isOpen.toString());
+  document.body.classList.toggle('sidebar-open', isOpen);
+}
 
-// 管理功能事件绑定
-(function bindAdmin() {
+function closeSidebar() {
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('sidebarOverlay');
+  const hamburger = document.getElementById('hamburger');
+  sidebar.classList.remove('open');
+  overlay.classList.remove('open');
+  hamburger.classList.remove('open');
+  hamburger.setAttribute('aria-expanded', 'false');
+  document.body.classList.remove('sidebar-open');
+}
+
+/* ================================================================
+   BACK TO TOP
+   ================================================================ */
+const backToTop = document.getElementById('backToTop');
+window.addEventListener('scroll', debounce(() => {
+  backToTop.classList.toggle('show', window.scrollY > 600);
+}, 100));
+
+backToTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+/* ================================================================
+   BIND ALL EVENTS
+   ================================================================ */
+function bindAll() {
+  // === FILTERS (bind first, before anything that could throw) ===
+  const filterInputs = $$('.filter-type, .filter-subject, .filter-mode');
+  filterInputs.forEach(function(el) {
+    el.addEventListener('change', function() { renderCards(true); });
+  });
+
+  const gradeFilter = document.getElementById('gradeFilter');
+  if (gradeFilter) gradeFilter.addEventListener('change', function() { renderCards(true); });
+
+  const sortSel = document.getElementById('sortSelect');
+  if (sortSel) sortSel.addEventListener('change', function() { renderCards(true); });
+
+  // === SEARCH ===
+  const searchInput = document.getElementById('searchInput');
+  if (searchInput) searchInput.addEventListener('input', function() { debouncedRender(); });
+  const searchBtn = document.getElementById('searchBtn');
+  if (searchBtn) searchBtn.addEventListener('click', function() { renderCards(true); });
+
+  // === HERO CTA ===
+  const heroBtn = document.querySelector('.post-btn-hero');
+  if (heroBtn) heroBtn.addEventListener('click', openModal);
+
+  // === POST BUTTON ===
+  const postBtn = document.querySelector('.post-btn');
+  if (postBtn) postBtn.addEventListener('click', openModal);
+
+  // === MODAL CLOSE ===
+  var closeBtn = document.querySelector('.modal-close');
+  if (closeBtn) closeBtn.addEventListener('click', closeModal);
+  var ov = document.getElementById('overlay');
+  if (ov) ov.addEventListener('click', function(e) { if (e.target === ov) closeModal(); });
+
+  // === ROLE TOGGLE ===
+  var rt = document.getElementById('roleTeacher');
+  var rs = document.getElementById('roleStudent');
+  if (rt) rt.addEventListener('click', function() { setRole('teacher'); });
+  if (rs) rs.addEventListener('click', function() { setRole('student'); });
+
+  // === SUBJECT CHIPS (publish modal only) ===
+  $$('#subjectChips .subject-chip').forEach(function(c) {
+    c.addEventListener('click', function() {
+      this.classList.toggle('selected');
+      this.setAttribute('aria-checked', this.classList.contains('selected').toString());
+    });
+    c.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); this.click(); }
+    });
+  });
+
+  // === FORM SUBMIT ===
+  var form = document.getElementById('postForm');
+  if (form) form.addEventListener('submit', handleFormSubmit);
+
+  // === CANCEL BUTTON ===
+  var cancelBtn = document.querySelector('.btn-cancel');
+  if (cancelBtn) cancelBtn.addEventListener('click', closeModal);
+
+  // === TABS ===
+  $$('.tab-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      $$('.tab-btn').forEach(function(b) { b.classList.remove('active'); b.setAttribute('aria-selected', 'false'); });
+      this.classList.add('active');
+      this.setAttribute('aria-selected', 'true');
+      currentTab = this.dataset.tab;
+      renderCards(true);
+    });
+  });
+
+  // === HAMBURGER ===
+  var hamburger = document.getElementById('hamburger');
+  if (hamburger) hamburger.addEventListener('click', toggleSidebar);
+  var sidebarOverlay = document.getElementById('sidebarOverlay');
+  if (sidebarOverlay) sidebarOverlay.addEventListener('click', closeSidebar);
+  var sidebarClose = document.getElementById('sidebarCloseBtn');
+  if (sidebarClose) sidebarClose.addEventListener('click', closeSidebar);
+  if (window.innerWidth <= 768 && sidebarClose) sidebarClose.style.display = 'block';
+
+  // === ADMIN TOGGLE ===
   var adminToggle = document.getElementById('adminToggle');
   if (adminToggle) adminToggle.addEventListener('click', function() {
     if (isAdmin) { exitAdminMode(); return; }
-    showAdminLogin();
+    var pw = document.getElementById('adminPassword');
+    if (pw) pw.value = '';
+    document.getElementById('adminOverlay').classList.add('show');
+    setTimeout(function() { if (pw) pw.focus(); }, 100);
   });
 
-  // 管理员密码弹窗
-  document.getElementById('adminCancel').addEventListener('click', hideAdminLogin);
-  document.getElementById('adminOverlay').addEventListener('click', function(e) {
-    if (e.target === document.getElementById('adminOverlay')) hideAdminLogin();
-  });
-  document.getElementById('adminConfirm').addEventListener('click', function() {
-    var input = document.getElementById('adminPassword').value;
-    if (input === getAdminPassword()) {
-      hideAdminLogin();
+  // === ADMIN PASSWORD ===
+  var adminCancel = document.getElementById('adminCancel');
+  var adminOverlay = document.getElementById('adminOverlay');
+  var adminConfirm = document.getElementById('adminConfirm');
+  var adminPassword = document.getElementById('adminPassword');
+  if (adminCancel) adminCancel.addEventListener('click', function() { adminOverlay.classList.remove('show'); });
+  if (adminOverlay) adminOverlay.addEventListener('click', function(e) { if (e.target === this) this.classList.remove('show'); });
+  if (adminConfirm) adminConfirm.addEventListener('click', function() {
+    if (adminPassword && adminPassword.value === getAdminPassword()) {
+      adminOverlay.classList.remove('show');
       enterAdminMode();
     } else {
-      showToast('密码错误，请重试');
-      document.getElementById('adminPassword').value = '';
+      showToast('密码错误，请重试', true);
+      if (adminPassword) adminPassword.value = '';
     }
   });
-  document.getElementById('adminPassword').addEventListener('keydown', function(e) {
-    if (e.key === 'Enter') document.getElementById('adminConfirm').click();
+  if (adminPassword) adminPassword.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && adminConfirm) adminConfirm.click();
   });
 
-  // 编辑弹窗事件
-  var editOverlay = document.getElementById('editOverlay');
-  document.getElementById('editCloseBtn').addEventListener('click', function() {
-    editOverlay.classList.remove('show'); editingId = null;
-  });
-  editOverlay.addEventListener('click', function(e) {
-    if (e.target === editOverlay) { editOverlay.classList.remove('show'); editingId = null; }
-  });
-  document.getElementById('editCancel').addEventListener('click', function() {
-    editOverlay.classList.remove('show'); editingId = null;
-  });
-  document.getElementById('editForm').addEventListener('submit', saveEdit);
-
-  // 编辑弹窗角色切换
-  document.getElementById('editRoleTeacher').addEventListener('click', function(){ setEditRole('teacher'); });
-  document.getElementById('editRoleStudent').addEventListener('click', function(){ setEditRole('student'); });
-
-  // 编辑弹窗科目选择
-  document.querySelectorAll('#editSubjectChips .subject-chip').forEach(function(c) {
-    c.addEventListener('click', function(){ c.classList.toggle('selected'); });
-  });
-
-  // 关闭编辑弹窗快捷键
-  document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') {
-      if (editOverlay.classList.contains('show')) { editOverlay.classList.remove('show'); editingId = null; }
-      if (document.getElementById('adminOverlay').classList.contains('show')) hideAdminLogin();
-    }
-  });
-
-  // 修改密码功能：双击管理按钮
+  // === ADMIN: DOUBLE-CLICK TO CHANGE PASSWORD ===
   if (adminToggle) adminToggle.addEventListener('dblclick', function() {
     if (!isAdmin) return;
-    changeAdminPwd();
+    var pwd = prompt('请输入新管理密码（最少3位）：');
+    if (!pwd || pwd.length < 3) { showToast('密码至少3位，未修改'); return; }
+    setAdminPassword(pwd);
+    showToast('\u2705 管理密码已更新！');
   });
-})();
 
-renderCards();
+  // === EDIT OVERLAY ===
+  var editOverlay = document.getElementById('editOverlay');
+  var editCloseBtn = document.getElementById('editCloseBtn');
+  var editCancel = document.getElementById('editCancel');
+  var editForm = document.getElementById('editForm');
+  if (editCloseBtn) editCloseBtn.addEventListener('click', function() { editOverlay.classList.remove('show'); editingId = null; });
+  if (editOverlay) editOverlay.addEventListener('click', function(e) { if (e.target === editOverlay) { editOverlay.classList.remove('show'); editingId = null; } });
+  if (editCancel) editCancel.addEventListener('click', function() { editOverlay.classList.remove('show'); editingId = null; });
+  if (editForm) editForm.addEventListener('submit', saveEdit);
+
+  // === EDIT ROLE TOGGLE ===
+  var ert = document.getElementById('editRoleTeacher');
+  var ers = document.getElementById('editRoleStudent');
+  if (ert) ert.addEventListener('click', function() { setEditRole('teacher'); });
+  if (ers) ers.addEventListener('click', function() { setEditRole('student'); });
+
+  // === EDIT SUBJECT CHIPS ===
+  $$('#editSubjectChips .subject-chip').forEach(function(c) {
+    c.addEventListener('click', function() {
+      this.classList.toggle('selected');
+      this.setAttribute('aria-checked', this.classList.contains('selected').toString());
+    });
+    c.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); this.click(); }
+    });
+  });
+
+  // === ESC KEY ===
+  document.addEventListener('keydown', function(e) {
+    if (e.key !== 'Escape') return;
+    if (editOverlay && editOverlay.classList.contains('show')) { editOverlay.classList.remove('show'); editingId = null; }
+    else if (overlay && overlay.classList.contains('show')) closeModal();
+    else if (adminOverlay && adminOverlay.classList.contains('show')) adminOverlay.classList.remove('show');
+  });
+}
+
+/* ================================================================
+   INIT
+   ================================================================ */
+var _initRetries = 0;
+function init() {
+  if (typeof window.supabase === 'undefined') {
+    _initRetries++;
+    if (_initRetries > 50) {
+      showPageError('Supabase SDK 加载超时，请检查网络后刷新');
+      return;
+    }
+    setTimeout(init, 150);
+    return;
+  }
+
+  try {
+    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  } catch(e) {
+    showPageError('Supabase 初始化失败: ' + e.message);
+    return;
+  }
+
+  bindAll();
+  renderCards();
+}
+
+// Start init after DOM is fully ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', function() { init(); });
+} else {
+  init();
+}
 
 })();
 </script>
