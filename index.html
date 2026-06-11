@@ -286,6 +286,7 @@
   .tag-teacher { background: var(--color-primary-light); color: var(--color-primary); }
   .tag-student { background: var(--color-success-light); color: var(--color-success); }
   .tag-urgent { background: var(--color-warning-light); color: var(--color-warning); }
+  .tag-pending { background: #FFF3E0; color: #E65100; }
 
   .card-meta {
     display: flex; flex-wrap: wrap; gap: 14px;
@@ -321,6 +322,10 @@
   .btn-edit:hover { background: #D2E3FC; }
   .btn-delete { background: var(--color-danger-light); color: var(--color-danger); }
   .btn-delete:hover { background: #F8D7DA; }
+  .btn-approve { background: var(--color-success-light); color: var(--color-success); }
+  .btn-approve:hover { background: #C8E6C9; }
+  .btn-reject { background: #FFF3E0; color: #E65100; }
+  .btn-reject:hover { background: #FFE0B2; }
 
   /* ============ SKELETON ============ */
   .skeleton { background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: var(--radius-md); }
@@ -720,6 +725,11 @@
       <div class="form-group" id="grp_edu"><label>学历 / 院校</label><input type="text" id="f_edu" placeholder="如：北京大学 本科"></div>
       <div class="form-group"><label>联系方式<span class="req">*</span></label><input type="text" id="f_contact" placeholder="手机号 / 微信号" required></div>
       <div class="form-group"><label>详细介绍</label><textarea id="f_desc" placeholder="请简要介绍自己的教学经历、特点，或招聘需求..."></textarea></div>
+
+      <div style="position:absolute;left:-9999px;top:-9999px" aria-hidden="true">
+        <input type="text" id="f_honeypot" name="website" tabindex="-1" autocomplete="off">
+      </div>
+
       <div class="form-footer">
         <button type="button" class="btn-cancel">取消</button>
         <button type="submit" class="btn-submit">发布</button>
@@ -1006,7 +1016,8 @@ const cache = {
           subjects: row.subjects || [], grade: row.grade, mode: row.mode,
           location: row.location, price: row.price, edu: row.edu || '',
           contact: row.contact, desc: row.description || '',
-          time: new Date(row.created_at).getTime(), urgent: row.urgent || false
+          time: new Date(row.created_at).getTime(), urgent: row.urgent || false,
+          approved: row.approved !== false // defaults to true for old data
         };
       });
     } catch(e) {
@@ -1043,6 +1054,8 @@ function getFilters() {
 
 function filterData(list, f) {
   return list.filter(item => {
+    // Normal users only see approved items; admin sees all
+    if (!isAdmin && !item.approved) return false;
     if (currentTab !== 'all' && item.role !== currentTab) return false;
     if (!f.types.includes(item.role)) return false;
     if (f.grade && item.grade !== f.grade) return false;
@@ -1085,6 +1098,7 @@ function renderCard(item) {
     '<span class="card-title">' + esc(item.name) + ' &middot; ' + item.subjects.join(' / ') + '</span>' +
     '<div style="display:flex;gap:6px;flex-shrink:0">' +
     (item.urgent ? '<span class="tag tag-urgent">急招</span>' : '') +
+    (!item.approved ? '<span class="tag tag-pending">待审核</span>' : '') +
     '<span class="tag ' + (item.role === 'teacher' ? 'tag-teacher' : 'tag-student') + '">' +
     (item.role === 'teacher' ? '老师求职' : '家长招聘') + '</span>' +
     '</div></div>' +
@@ -1101,7 +1115,11 @@ function renderCard(item) {
     '<div class="card-actions">' +
     '<button class="btn-sm btn-contact contact-btn" data-id="' + item.id + '">查看联系方式</button>' +
     (isAdmin
-      ? '<button class="btn-sm btn-edit edit-btn" data-id="' + item.id + '" aria-label="编辑">编辑</button>' +
+      ? (!item.approved
+          ? '<button class="btn-sm btn-approve approve-btn" data-id="' + item.id + '" aria-label="审核通过">审核通过</button>' +
+            '<button class="btn-sm btn-reject reject-btn" data-id="' + item.id + '" aria-label="拒绝">拒绝</button>'
+          : '') +
+        '<button class="btn-sm btn-edit edit-btn" data-id="' + item.id + '" aria-label="编辑">编辑</button>' +
         '<button class="btn-sm btn-delete delete-btn" data-id="' + item.id + '" aria-label="删除">删除</button>'
       : '') +
     '</div></div></div>';
@@ -1179,6 +1197,12 @@ function bindCardEvents() {
   $$('.delete-btn', container).forEach(btn => {
     btn.addEventListener('click', function(e) { e.stopPropagation(); deleteItem(parseInt(this.dataset.id)); });
   });
+  $$('.approve-btn', container).forEach(btn => {
+    btn.addEventListener('click', function(e) { e.stopPropagation(); approveItem(parseInt(this.dataset.id)); });
+  });
+  $$('.reject-btn', container).forEach(btn => {
+    btn.addEventListener('click', function(e) { e.stopPropagation(); rejectItem(parseInt(this.dataset.id)); });
+  });
 }
 
 function showContact(id) {
@@ -1226,6 +1250,12 @@ async function handleFormSubmit(e) {
   if (chips.length === 0) { showToast('请至少选择一个科目', true); return; }
   if (!supabase) { showToast('数据库未连接，请刷新', true); return; }
 
+  // Honeypot check: if filled, it's a bot
+  if (document.getElementById('f_honeypot').value) {
+    showToast('发布失败，请重试', true);
+    return;
+  }
+
   const payload = {
     role: currentRole, name: document.getElementById('f_name').value.trim(),
     gender: document.getElementById('f_gender').value,
@@ -1251,7 +1281,7 @@ async function handleFormSubmit(e) {
   closeModal();
   cache.invalidate();
   await renderCards(true);
-  showToast('\u2705 发布成功！数据已同步到云端');
+  showToast('\u2705 发布成功！管理员审核通过后将公开展示');
 }
 
 /* ================================================================
@@ -1410,6 +1440,29 @@ async function deleteItem(id) {
   cache.invalidate();
   await renderCards(true);
   showToast('\u2705 信息已删除');
+}
+
+async function approveItem(id) {
+  if (!supabase) { showToast('数据库未连接', true); return; }
+  try {
+    const result = await supabase.from('tutors').update({ approved: true }).eq('id', id);
+    if (result.error) { showToast('操作失败：' + result.error.message, true); return; }
+  } catch(err) { showToast('操作失败：' + err.message, true); return; }
+  cache.invalidate();
+  await renderCards(true);
+  showToast('\u2705 已审核通过，公开可见');
+}
+
+async function rejectItem(id) {
+  if (!confirm('确定要拒绝这条信息吗？拒绝后将被删除。')) return;
+  if (!supabase) { showToast('数据库未连接', true); return; }
+  try {
+    const result = await supabase.from('tutors').delete().eq('id', id);
+    if (result.error) { showToast('操作失败：' + result.error.message, true); return; }
+  } catch(err) { showToast('操作失败：' + err.message, true); return; }
+  cache.invalidate();
+  await renderCards(true);
+  showToast('已拒绝并删除该信息');
 }
 
 /* ================================================================
