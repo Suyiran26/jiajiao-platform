@@ -1036,28 +1036,45 @@ const SITE_DEFAULTS = {
   footerMeta: '数据存储于 Supabase · 托管于 GitHub Pages'
 };
 
+var siteConfigCache = null;
+
+async function fetchSiteConfig() {
+  if (siteConfigCache) return siteConfigCache;
+  if (!supabase) return {};
+  try {
+    var result = await supabase.from('site_config').select('key,value');
+    if (result.error) return {};
+    siteConfigCache = {};
+    (result.data || []).forEach(function(row) { siteConfigCache[row.key] = row.value; });
+    return siteConfigCache;
+  } catch(e) { return {}; }
+}
+
 function getSiteConfig() {
   try {
-    var stored = localStorage.getItem('tutor_site_config');
-    if (stored) return JSON.parse(stored);
+    var stored = JSON.parse(localStorage.getItem('tutor_site_config') || 'null');
+    if (stored && Object.keys(stored).length > 0) return stored;
   } catch(e) {}
   return {};
 }
 
-function saveSiteConfig(cfg) { localStorage.setItem('tutor_site_config', JSON.stringify(cfg)); }
-
-function getConfigValue(key) {
-  var cfg = getSiteConfig();
-  return cfg[key] || SITE_DEFAULTS[key] || '';
+async function getSiteConfigAsync() {
+  var local = getSiteConfig();
+  if (local && Object.keys(local).length > 0) return local;
+  var cloud = await fetchSiteConfig();
+  return cloud || local || {};
 }
 
-function applySiteConfig() {
-  var cfg = getSiteConfig();
+function getConfigValue(key) {
+  return (SITE_DEFAULTS[key] || '');
+}
+
+async function applySiteConfig() {
+  var cfg = await getSiteConfigAsync();
   var t = cfg.title || SITE_DEFAULTS.title;
   document.title = t;
   var logo = document.querySelector('.logo');
   if (logo) {
-    // Find the last text node (after the icon span)
     var textNode = logo.lastChild;
     if (textNode && textNode.nodeType === 3) textNode.textContent = ' ' + t;
   }
@@ -1071,10 +1088,14 @@ function applySiteConfig() {
   if (footerDivs[0]) footerDivs[0].textContent = cfg.footerName || SITE_DEFAULTS.footerName;
   if (footerDivs[1]) footerDivs[1].textContent = cfg.footerTagline || SITE_DEFAULTS.footerTagline;
   if (footerDivs[2]) footerDivs[2].textContent = cfg.footerMeta || SITE_DEFAULTS.footerMeta;
+  var img = document.getElementById('qrCode');
+  var ph = document.getElementById('qrPlaceholder');
+  var qrUrl = cfg.qr_url || '';
+  if (qrUrl) { if (img) { img.src = qrUrl; img.style.display = ''; } if (ph) ph.style.display = 'none'; }
 }
 
-function openSiteSettings() {
-  var cfg = getSiteConfig();
+async function openSiteSettings() {
+  var cfg = await getSiteConfigAsync();
   document.getElementById('site_title').value = cfg.title || SITE_DEFAULTS.title;
   document.getElementById('site_hero_title').value = cfg.heroTitle || SITE_DEFAULTS.heroTitle;
   document.getElementById('site_hero_subtitle').value = cfg.heroSubtitle || SITE_DEFAULTS.heroSubtitle;
@@ -1082,11 +1103,11 @@ function openSiteSettings() {
   document.getElementById('site_footer_name').value = cfg.footerName || SITE_DEFAULTS.footerName;
   document.getElementById('site_footer_tagline').value = cfg.footerTagline || SITE_DEFAULTS.footerTagline;
   document.getElementById('site_footer_meta').value = cfg.footerMeta || SITE_DEFAULTS.footerMeta;
-  document.getElementById('site_qr_url').value = localStorage.getItem('tutor_qr_url') || '';
+  document.getElementById('site_qr_url').value = cfg.qr_url || '';
   document.getElementById('siteSettingsOverlay').classList.add('show');
 }
 
-function saveSiteSettings(e) {
+async function saveSiteSettings(e) {
   e.preventDefault();
   var cfg = {
     title: document.getElementById('site_title').value.trim(),
@@ -1095,22 +1116,22 @@ function saveSiteSettings(e) {
     welcomeText: document.getElementById('site_welcome_text').value.trim(),
     footerName: document.getElementById('site_footer_name').value.trim(),
     footerTagline: document.getElementById('site_footer_tagline').value.trim(),
-    footerMeta: document.getElementById('site_footer_meta').value.trim()
+    footerMeta: document.getElementById('site_footer_meta').value.trim(),
+    qr_url: document.getElementById('site_qr_url').value.trim()
   };
-  var qrUrl = document.getElementById('site_qr_url').value.trim();
-  localStorage.setItem('tutor_qr_url', qrUrl);
-  // Update QR display immediately
-  var img = document.getElementById('qrCode');
-  var ph = document.getElementById('qrPlaceholder');
-  if (qrUrl) {
-    if (img) { img.src = qrUrl; img.style.display = ''; }
-    if (ph) ph.style.display = 'none';
-  } else {
-    if (img) img.style.display = 'none';
-    if (ph) ph.style.display = '';
+  // Save to localStorage (instant for current device)
+  localStorage.setItem('tutor_site_config', JSON.stringify(cfg));
+  // Save to Supabase (syncs to all devices)
+  if (supabase) {
+    var keys = Object.keys(cfg);
+    for (var i = 0; i < keys.length; i++) {
+      if (cfg[keys[i]]) {
+        try { await supabase.rpc('save_site_config', { cfg_key: keys[i], cfg_value: cfg[keys[i]] }); } catch(e) {}
+      }
+    }
+    siteConfigCache = null;
   }
-  saveSiteConfig(cfg);
-  applySiteConfig();
+  await applySiteConfig();
   document.getElementById('siteSettingsOverlay').classList.remove('show');
   showToast('\u2705 网站设置已保存！');
 }
@@ -1713,14 +1734,6 @@ backToTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 's
     panel.classList.toggle('open');
     tab.textContent = panel.classList.contains('open') ? '✕ 关闭' : '❤ 捐助';
   });
-  // Load QR code if URL configured
-  var qrUrl = localStorage.getItem('tutor_qr_url');
-  if (qrUrl) {
-    var img = document.getElementById('qrCode');
-    var placeholder = document.getElementById('qrPlaceholder');
-    if (img) { img.src = qrUrl; img.style.display = ''; }
-    if (placeholder) placeholder.style.display = 'none';
-  }
 })();
 
 /* ================================================================
