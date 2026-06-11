@@ -525,6 +525,46 @@
     .steps { flex-direction: column; align-items: center; gap: 16px; }
     .step-arrow { transform: rotate(90deg); padding-top: 0; }
   }
+
+  /* ============ DONATION PANEL ============ */
+  .donation-panel {
+    position: fixed; right: 0; top: 50%; transform: translateY(-50%);
+    z-index: 90; display: flex; align-items: center;
+    transition: transform 0.3s ease;
+  }
+  .donation-tab {
+    writing-mode: vertical-rl;
+    padding: 14px 8px;
+    background: var(--color-primary);
+    color: #fff; border: none;
+    border-radius: 8px 0 0 8px;
+    font-size: 13px; font-weight: 600;
+    cursor: pointer; letter-spacing: 2px;
+    box-shadow: var(--shadow-sm);
+    transition: background var(--transition-fast);
+  }
+  .donation-tab:hover { background: var(--color-primary-hover); }
+  .donation-body {
+    width: 220px;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 12px 0 0 12px;
+    padding: 18px; text-align: center;
+    box-shadow: var(--shadow-md);
+    display: none;
+  }
+  .donation-panel.open .donation-body { display: block; }
+  .donation-panel.open .donation-tab { border-radius: 0; }
+  .qr-placeholder {
+    width: 160px; height: 160px; margin: 0 auto;
+    background: #f9f9f9; border: 1px dashed #ddd;
+    border-radius: 8px; display: flex;
+    align-items: center; justify-content: center;
+  }
+  @media (max-width: 768px) {
+    .donation-body { width: 200px; padding: 14px; }
+    .donation-tab { padding: 10px 6px; font-size: 12px; }
+  }
 </style>
 </head>
 <body aria-label="家教信息平台">
@@ -843,6 +883,10 @@
         <label>页脚第三行</label>
         <input type="text" id="site_footer_meta" placeholder="数据存储于 Supabase · 托管于 GitHub Pages">
       </div>
+      <div class="form-group">
+        <label>支付宝收款码图片链接</label>
+        <input type="text" id="site_qr_url" placeholder="https://... 留空则不显示收款码">
+      </div>
       <div class="form-footer">
         <button type="button" class="btn-cancel" id="siteSettingsCancel">取消</button>
         <button type="submit" class="btn-submit">保存设置</button>
@@ -873,6 +917,23 @@
 
 <!-- ============ SCRIPTS ============ -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js" defer></script>
+
+<!-- ============ DONATION PANEL ============ -->
+<div class="donation-panel" id="donationPanel" aria-label="捐助面板">
+  <button class="donation-tab" id="donationTab" aria-label="打开捐助面板">&#10084; 捐助</button>
+  <div class="donation-body">
+    <h3 style="font-size:15px;font-weight:600;margin-bottom:6px;color:var(--color-text)">支持我们</h3>
+    <p style="font-size:12px;color:var(--color-text-muted);margin-bottom:14px">如果这个平台帮到了你，欢迎扫码捐助</p>
+    <div class="qr-placeholder" id="qrPlaceholder">
+      <div style="font-size:13px;color:var(--color-text-muted);text-align:center">
+        <div style="font-size:36px;margin-bottom:8px">&#128179;</div>
+        请将支付宝收款码图片<br>放入项目目录并更新链接
+      </div>
+    </div>
+    <img class="qr-code" id="qrCode" src="" alt="支付宝收款码" style="display:none;width:100%;max-width:180px;border-radius:8px;margin:0 auto">
+    <p style="font-size:11px;color:#aaa;margin-top:8px">感谢每一份支持 &#10084;</p>
+  </div>
+</div>
 
 <!-- ============ FOOTER ============ -->
 <footer role="contentinfo" style="background:var(--color-surface);border-top:1px solid var(--color-border);padding:24px max(16px,3vw);text-align:center;font-size:12px;color:var(--color-text-muted);line-height:1.8">
@@ -995,7 +1056,11 @@ function applySiteConfig() {
   var t = cfg.title || SITE_DEFAULTS.title;
   document.title = t;
   var logo = document.querySelector('.logo');
-  if (logo) { logo.childNodes[1] && (logo.childNodes[1].textContent = ' ' + t); }
+  if (logo) {
+    // Find the last text node (after the icon span)
+    var textNode = logo.lastChild;
+    if (textNode && textNode.nodeType === 3) textNode.textContent = ' ' + t;
+  }
   var heroH1 = document.querySelector('.hero h1');
   if (heroH1) heroH1.textContent = cfg.heroTitle || SITE_DEFAULTS.heroTitle;
   var heroP = document.querySelector('.hero p');
@@ -1017,6 +1082,7 @@ function openSiteSettings() {
   document.getElementById('site_footer_name').value = cfg.footerName || SITE_DEFAULTS.footerName;
   document.getElementById('site_footer_tagline').value = cfg.footerTagline || SITE_DEFAULTS.footerTagline;
   document.getElementById('site_footer_meta').value = cfg.footerMeta || SITE_DEFAULTS.footerMeta;
+  document.getElementById('site_qr_url').value = localStorage.getItem('tutor_qr_url') || '';
   document.getElementById('siteSettingsOverlay').classList.add('show');
 }
 
@@ -1031,6 +1097,18 @@ function saveSiteSettings(e) {
     footerTagline: document.getElementById('site_footer_tagline').value.trim(),
     footerMeta: document.getElementById('site_footer_meta').value.trim()
   };
+  var qrUrl = document.getElementById('site_qr_url').value.trim();
+  localStorage.setItem('tutor_qr_url', qrUrl);
+  // Update QR display immediately
+  var img = document.getElementById('qrCode');
+  var ph = document.getElementById('qrPlaceholder');
+  if (qrUrl) {
+    if (img) { img.src = qrUrl; img.style.display = ''; }
+    if (ph) ph.style.display = 'none';
+  } else {
+    if (img) img.style.display = 'none';
+    if (ph) ph.style.display = '';
+  }
   saveSiteConfig(cfg);
   applySiteConfig();
   document.getElementById('siteSettingsOverlay').classList.remove('show');
@@ -1623,6 +1701,27 @@ window.addEventListener('scroll', debounce(() => {
 }, 100));
 
 backToTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+/* ================================================================
+   DONATION PANEL
+   ================================================================ */
+(function initDonation() {
+  var tab = document.getElementById('donationTab');
+  var panel = document.getElementById('donationPanel');
+  if (!tab || !panel) return;
+  tab.addEventListener('click', function() {
+    panel.classList.toggle('open');
+    tab.textContent = panel.classList.contains('open') ? '✕ 关闭' : '❤ 捐助';
+  });
+  // Load QR code if URL configured
+  var qrUrl = localStorage.getItem('tutor_qr_url');
+  if (qrUrl) {
+    var img = document.getElementById('qrCode');
+    var placeholder = document.getElementById('qrPlaceholder');
+    if (img) { img.src = qrUrl; img.style.display = ''; }
+    if (placeholder) placeholder.style.display = 'none';
+  }
+})();
 
 /* ================================================================
    BIND ALL EVENTS
