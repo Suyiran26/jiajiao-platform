@@ -540,6 +540,7 @@
     </a>
   </div>
   <div class="header-actions">
+    <button class="btn btn-ghost site-settings-btn" id="siteSettingsBtn" style="display:none" aria-label="网站设置">&#9881; 网站设置</button>
     <button class="btn btn-ghost" id="adminToggle" aria-label="管理">&#9881;</button>
     <button class="btn btn-primary post-btn" aria-label="发布家教信息">+ 发布信息</button>
   </div>
@@ -806,6 +807,50 @@
 <!-- ============ TOAST ============ -->
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
+<!-- ============ SITE SETTINGS MODAL (admin only) ============ -->
+<div class="overlay" id="siteSettingsOverlay" role="dialog" aria-modal="true" aria-label="网站设置">
+  <div class="modal" style="max-width:560px">
+    <div class="modal-header">
+      <h2>网站设置</h2>
+      <button class="modal-close" id="siteSettingsClose">&#10005;</button>
+    </div>
+    <form id="siteSettingsForm">
+      <div class="form-group">
+        <label>网站标题</label>
+        <input type="text" id="site_title" placeholder="肃宁县家教平台">
+      </div>
+      <div class="form-group">
+        <label>Hero 主标题</label>
+        <input type="text" id="site_hero_title" placeholder="肃宁县家教平台">
+      </div>
+      <div class="form-group">
+        <label>Hero 副标题</label>
+        <input type="text" id="site_hero_subtitle" placeholder="发现好老师，找到好学生">
+      </div>
+      <div class="form-group">
+        <label>欢迎弹窗正文（支持多行）</label>
+        <textarea id="site_welcome_text" rows="3" placeholder="本平台供家教老师发布求职信息..."></textarea>
+      </div>
+      <div class="form-group">
+        <label>页脚第一行</label>
+        <input type="text" id="site_footer_name" placeholder="肃宁县家教平台">
+      </div>
+      <div class="form-group">
+        <label>页脚第二行</label>
+        <input type="text" id="site_footer_tagline" placeholder="自由发布 · 直接联系 · 完全免费 · 无中介">
+      </div>
+      <div class="form-group">
+        <label>页脚第三行</label>
+        <input type="text" id="site_footer_meta" placeholder="数据存储于 Supabase · 托管于 GitHub Pages">
+      </div>
+      <div class="form-footer">
+        <button type="button" class="btn-cancel" id="siteSettingsCancel">取消</button>
+        <button type="submit" class="btn-submit">保存设置</button>
+      </div>
+    </form>
+  </div>
+</div>
+
 <!-- ============ WELCOME MODAL (first visit only) ============ -->
 <div class="overlay show" id="welcomeOverlay" role="dialog" aria-modal="true" aria-label="欢迎访问肃宁县家教平台">
   <div class="modal" style="max-width:440px;text-align:center">
@@ -916,6 +961,81 @@ const SUPABASE_URL = 'https://pjwnpdgoffsolauxhcju.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBqd25wZGdvZmZzb2xhdXhoY2p1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODExMzMyOTQsImV4cCI6MjA5NjcwOTI5NH0.HbLsVEwYZ3mmuBtj1z1o2gKxytMKfn7qJuaawZVhV2c';
 
 let supabase;
+
+/* ================================================================
+   SITE CONFIG (editable from admin panel, persisted in localStorage)
+   ================================================================ */
+const SITE_DEFAULTS = {
+  title: '肃宁县家教平台',
+  heroTitle: '肃宁县家教平台',
+  heroSubtitle: '发现好老师，找到好学生 — 肃宁本地免费家教信息发布平台',
+  welcomeText: '本平台供家教老师发布求职信息，以及学生和家长发布招聘需求。完全免费，双方直接联系，无任何中介费用。',
+  footerName: '肃宁县家教平台',
+  footerTagline: '自由发布 · 直接联系 · 完全免费 · 无中介',
+  footerMeta: '数据存储于 Supabase · 托管于 GitHub Pages'
+};
+
+function getSiteConfig() {
+  try {
+    var stored = localStorage.getItem('tutor_site_config');
+    if (stored) return JSON.parse(stored);
+  } catch(e) {}
+  return {};
+}
+
+function saveSiteConfig(cfg) { localStorage.setItem('tutor_site_config', JSON.stringify(cfg)); }
+
+function getConfigValue(key) {
+  var cfg = getSiteConfig();
+  return cfg[key] || SITE_DEFAULTS[key] || '';
+}
+
+function applySiteConfig() {
+  var cfg = getSiteConfig();
+  var t = cfg.title || SITE_DEFAULTS.title;
+  document.title = t;
+  var logo = document.querySelector('.logo');
+  if (logo) { logo.childNodes[1] && (logo.childNodes[1].textContent = ' ' + t); }
+  var heroH1 = document.querySelector('.hero h1');
+  if (heroH1) heroH1.textContent = cfg.heroTitle || SITE_DEFAULTS.heroTitle;
+  var heroP = document.querySelector('.hero p');
+  if (heroP) heroP.textContent = cfg.heroSubtitle || SITE_DEFAULTS.heroSubtitle;
+  var welcomeP = document.querySelector('#welcomeOverlay p');
+  if (welcomeP) welcomeP.innerHTML = (cfg.welcomeText || SITE_DEFAULTS.welcomeText).replace(/\n/g, '<br>');
+  var footerDivs = document.querySelectorAll('footer div');
+  if (footerDivs[0]) footerDivs[0].textContent = cfg.footerName || SITE_DEFAULTS.footerName;
+  if (footerDivs[1]) footerDivs[1].textContent = cfg.footerTagline || SITE_DEFAULTS.footerTagline;
+  if (footerDivs[2]) footerDivs[2].textContent = cfg.footerMeta || SITE_DEFAULTS.footerMeta;
+}
+
+function openSiteSettings() {
+  var cfg = getSiteConfig();
+  document.getElementById('site_title').value = cfg.title || SITE_DEFAULTS.title;
+  document.getElementById('site_hero_title').value = cfg.heroTitle || SITE_DEFAULTS.heroTitle;
+  document.getElementById('site_hero_subtitle').value = cfg.heroSubtitle || SITE_DEFAULTS.heroSubtitle;
+  document.getElementById('site_welcome_text').value = cfg.welcomeText || SITE_DEFAULTS.welcomeText;
+  document.getElementById('site_footer_name').value = cfg.footerName || SITE_DEFAULTS.footerName;
+  document.getElementById('site_footer_tagline').value = cfg.footerTagline || SITE_DEFAULTS.footerTagline;
+  document.getElementById('site_footer_meta').value = cfg.footerMeta || SITE_DEFAULTS.footerMeta;
+  document.getElementById('siteSettingsOverlay').classList.add('show');
+}
+
+function saveSiteSettings(e) {
+  e.preventDefault();
+  var cfg = {
+    title: document.getElementById('site_title').value.trim(),
+    heroTitle: document.getElementById('site_hero_title').value.trim(),
+    heroSubtitle: document.getElementById('site_hero_subtitle').value.trim(),
+    welcomeText: document.getElementById('site_welcome_text').value.trim(),
+    footerName: document.getElementById('site_footer_name').value.trim(),
+    footerTagline: document.getElementById('site_footer_tagline').value.trim(),
+    footerMeta: document.getElementById('site_footer_meta').value.trim()
+  };
+  saveSiteConfig(cfg);
+  applySiteConfig();
+  document.getElementById('siteSettingsOverlay').classList.remove('show');
+  showToast('\u2705 网站设置已保存！');
+}
 
 /* ================================================================
    UTILITY FUNCTIONS
@@ -1297,6 +1417,8 @@ function enterAdminMode() {
   const btn = document.getElementById('adminToggle');
   btn.classList.add('active');
   btn.innerHTML = '&#9881; 退出';
+  const ssb = document.getElementById('siteSettingsBtn');
+  if (ssb) ssb.style.display = '';
   renderCards(true);
   showToast('已进入管理模式');
 }
@@ -1306,6 +1428,8 @@ function exitAdminMode() {
   const btn = document.getElementById('adminToggle');
   btn.classList.remove('active');
   btn.innerHTML = '&#9881;';
+  const ssb = document.getElementById('siteSettingsBtn');
+  if (ssb) ssb.style.display = 'none';
   document.getElementById('editOverlay').classList.remove('show');
   renderCards(true);
   showToast('已退出管理模式');
@@ -1606,6 +1730,20 @@ function bindAll() {
     setTimeout(function() { if (pw) pw.focus(); }, 100);
   });
 
+  // === SITE SETTINGS ===
+  var siteSettingsBtn = document.getElementById('siteSettingsBtn');
+  var siteSettingsOverlay = document.getElementById('siteSettingsOverlay');
+  if (siteSettingsBtn) siteSettingsBtn.addEventListener('click', openSiteSettings);
+  if (siteSettingsOverlay) siteSettingsOverlay.addEventListener('click', function(e) {
+    if (e.target === siteSettingsOverlay) siteSettingsOverlay.classList.remove('show');
+  });
+  var ssc = document.getElementById('siteSettingsClose');
+  var ssca = document.getElementById('siteSettingsCancel');
+  var ssf = document.getElementById('siteSettingsForm');
+  if (ssc) ssc.addEventListener('click', function() { siteSettingsOverlay.classList.remove('show'); });
+  if (ssca) ssca.addEventListener('click', function() { siteSettingsOverlay.classList.remove('show'); });
+  if (ssf) ssf.addEventListener('submit', saveSiteSettings);
+
   // === ADMIN PASSWORD ===
   var adminCancel = document.getElementById('adminCancel');
   var adminOverlay = document.getElementById('adminOverlay');
@@ -1668,6 +1806,7 @@ function bindAll() {
     if (editOverlay && editOverlay.classList.contains('show')) { editOverlay.classList.remove('show'); editingId = null; }
     else if (overlay && overlay.classList.contains('show')) closeModal();
     else if (adminOverlay && adminOverlay.classList.contains('show')) adminOverlay.classList.remove('show');
+    else if (siteSettingsOverlay && siteSettingsOverlay.classList.contains('show')) siteSettingsOverlay.classList.remove('show');
   });
 }
 
@@ -1696,6 +1835,9 @@ function init() {
   // Initialize area dropdowns (publish + edit forms)
   initAreaSelects('f_province', 'f_city', 'f_district', DEFAULT_AREA.province, DEFAULT_AREA.city, DEFAULT_AREA.district);
   initAreaSelects('edit_province', 'edit_city', 'edit_district', DEFAULT_AREA.province, DEFAULT_AREA.city, DEFAULT_AREA.district);
+
+  // Apply site config from localStorage
+  applySiteConfig();
 
   // Hide welcome modal if already seen
   if (localStorage.getItem('tutor_welcome_seen') === '1') {
